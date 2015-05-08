@@ -30,26 +30,26 @@ import org.apache.storm.hdfs.common.rotation.MoveFileAction;
 import java.util.Map;
 
 public class HdfsFileTopology {
-	
+
 	public static class ExclamationBolt extends BaseRichBolt {
-	    OutputCollector _collector;
+		OutputCollector _collector;
 
-	    @Override
-	    public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
-	      _collector = collector;
-	    }
+		@Override
+		public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+			_collector = collector;
+		}
 
-	    @Override
-	    public void execute(Tuple tuple) {
-	      _collector.emit(tuple, new Values(tuple.getString(0) + "!!!"));
-	      _collector.ack(tuple);
-	    }
+		@Override
+		public void execute(Tuple tuple) {
+			_collector.emit(tuple, new Values(tuple.getString(0) + "!!!"));
+			_collector.ack(tuple);
+		}
 
-	    @Override
-	    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-	      declarer.declare(new Fields("word"));
-	    }
-	  }
+		@Override
+		public void declareOutputFields(OutputFieldsDeclarer declarer) {
+			declarer.declare(new Fields("word"));
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
 		// sync the filesystem after every 1k tuples
