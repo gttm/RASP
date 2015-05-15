@@ -35,7 +35,8 @@ public class HdfsFileTopology {
 		OutputCollector _collector;
 
 		@Override
-		public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+		public void prepare(Map conf, TopologyContext context,
+				OutputCollector collector) {
 			_collector = collector;
 		}
 
@@ -52,43 +53,45 @@ public class HdfsFileTopology {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// sync the filesystem after every 1k tuples
+		// Sync the filesystem after every 1k tuples
 		SyncPolicy syncPolicy = new CountSyncPolicy(1000);
 
-		// rotate files when they reach 5MB
-		FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(100.0f, Units.KB);
+		// Rotate files when they reach 100KB
+		FileRotationPolicy rotationPolicy = new FileSizeRotationPolicy(100.0f,
+				Units.KB);
 
-		FileNameFormat fileNameFormat = new DefaultFileNameFormat()
-			.withPath("/storm/test/")
-			.withExtension(".txt");
+		FileNameFormat fileNameFormat = new DefaultFileNameFormat().withPath(
+				"/storm/test/").withExtension(".txt");
 
-		// use "|" instead of "," for field delimiter
+		// Use "|" instead of "," for field delimiter
 		RecordFormat format = new DelimitedRecordFormat()
-			.withFieldDelimiter("|");
+				.withFieldDelimiter("|");
 
 		// Instantiate the HdfsBolt
 		HdfsBolt bolt = new HdfsBolt()
-			.withFsUrl("hdfs://master:9000")
-			.withFileNameFormat(fileNameFormat)
-			.withRecordFormat(format)
-			.withRotationPolicy(rotationPolicy)
-			.withSyncPolicy(syncPolicy)
-			.addRotationAction(new MoveFileAction().toDestination("/storm/test/archive/"));
-		
+				.withFsUrl("hdfs://master:9000")
+				.withFileNameFormat(fileNameFormat)
+				.withRecordFormat(format)
+				.withRotationPolicy(rotationPolicy)
+				.withSyncPolicy(syncPolicy)
+				.addRotationAction(
+						new MoveFileAction()
+								.toDestination("/storm/test/archive/"));
+
 		TopologyBuilder builder = new TopologyBuilder();
 
-	    builder.setSpout("word", new TestWordSpout(), 2);
-	    builder.setBolt("exclaim1", new ExclamationBolt(), 2).shuffleGrouping("word");
-	    builder.setBolt("exclaim2", new ExclamationBolt(), 2).shuffleGrouping("exclaim1");
-	    builder.setBolt("output", bolt, 2).shuffleGrouping("exclaim2");
+		builder.setSpout("word", new TestWordSpout(), 2);
+		builder.setBolt("exclaim1", new ExclamationBolt(), 2).shuffleGrouping(
+				"word");
+		builder.setBolt("exclaim2", new ExclamationBolt(), 2).shuffleGrouping(
+				"exclaim1");
+		builder.setBolt("output", bolt, 2).shuffleGrouping("exclaim2");
 
-	    Config conf = new Config();
-	    conf.setDebug(true);
+		Config conf = new Config();
+		conf.setDebug(true);
+		conf.setNumWorkers(3);
 
-	    if (args != null && args.length > 0) {
-	      conf.setNumWorkers(3);
-
-	      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-	    }
+		StormSubmitter.submitTopology("HdfsFileTopology", conf,
+				builder.createTopology());
 	}
 }

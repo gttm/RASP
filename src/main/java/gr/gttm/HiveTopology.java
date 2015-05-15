@@ -24,13 +24,14 @@ import java.util.Map;
 import java.util.Random;
 
 public class HiveTopology {
-	
+
 	public static class RandomRowSpout extends BaseRichSpout {
 		SpoutOutputCollector _collector;
 		Random _rand;
 
 		@Override
-		public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+		public void open(Map conf, TopologyContext context,
+				SpoutOutputCollector collector) {
 			_collector = collector;
 			_rand = new Random();
 		}
@@ -38,8 +39,9 @@ public class HiveTopology {
 		@Override
 		public void nextTuple() {
 			Utils.sleep(100);
-			int[] intPool = {0, 1, 2, 3, 4};
-			String[] stringPool = new String[]{"string0", "string1", "string2", "string3", "string4"};
+			int[] intPool = { 0, 1, 2, 3, 4 };
+			String[] stringPool = new String[] { "string0", "string1",
+					"string2", "string3", "string4" };
 			int randInt = intPool[_rand.nextInt(intPool.length)];
 			String randString = stringPool[_rand.nextInt(stringPool.length)];
 			_collector.emit(new Values(randInt, randString));
@@ -62,33 +64,29 @@ public class HiveTopology {
 
 	public static void main(String[] args) throws Exception {
 		String metaStoreURI = "thrift://master:9083";
-        String dbName = "default";
-        String tblName = "storm_test";
-        String[] colNames = {"col1", "col2"};
-        
+		String dbName = "default";
+		String tblName = "storm_test";
+		String[] colNames = { "col1", "col2" };
+
 		DelimitedRecordHiveMapper mapper = new DelimitedRecordHiveMapper()
-        	.withColumnFields(new Fields(colNames));
-		
-		HiveOptions hiveOptions = new HiveOptions(metaStoreURI,dbName,tblName,mapper)
-        	.withTxnsPerBatch(10)
-        	.withBatchSize(100)
-        	.withIdleTimeout(10);
+				.withColumnFields(new Fields(colNames));
 
+		HiveOptions hiveOptions = new HiveOptions(metaStoreURI, dbName,
+				tblName, mapper).withTxnsPerBatch(10).withBatchSize(100)
+				.withIdleTimeout(10);
 
-        HiveBolt hiveBolt = new HiveBolt(hiveOptions);
-		
+		HiveBolt hiveBolt = new HiveBolt(hiveOptions);
+
 		TopologyBuilder builder = new TopologyBuilder();
 
-	    builder.setSpout("row", new RandomRowSpout(), 2);
-	    builder.setBolt("output", hiveBolt, 1).shuffleGrouping("row");
+		builder.setSpout("row", new RandomRowSpout(), 2);
+		builder.setBolt("output", hiveBolt, 1).shuffleGrouping("row");
 
-	    Config conf = new Config();
-	    conf.setDebug(true);
+		Config conf = new Config();
+		conf.setDebug(true);
+		conf.setNumWorkers(2);
 
-	    if (args != null && args.length > 0) {
-	      conf.setNumWorkers(2);
-
-	      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-	    }
+		StormSubmitter.submitTopology("HiveTopology", conf,
+				builder.createTopology());
 	}
 }
