@@ -1,7 +1,5 @@
 package gr.gttm;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
 
 import kafka.javaapi.producer.Producer;
@@ -47,8 +45,6 @@ public class PcapProducer {
 				Ip4 ip4 = new Ip4();
 				Tcp tcp = new Tcp();
 				Udp udp = new Udp();
-				SimpleDateFormat dateFormatter = new SimpleDateFormat(
-						"yyyy-MM-dd");
 
 				public void nextPacket(JPacket packet, StringBuilder errbuf) {
 					if (packet.hasHeader(ip4)
@@ -56,15 +52,14 @@ public class PcapProducer {
 									.hasHeader(Udp.ID))) {
 						String sourceIp = FormatUtils.ip(ip4.source());
 						// Convert unsigned int to long
-						Long sourceIpInt = (long) (ip4.sourceToInt() & 0xffffffffl);
+						long sourceIpInt = (long) (ip4.sourceToInt() & 0xffffffffl);
 						String destinationIp = FormatUtils.ip(ip4.destination());
-						Long destinationIpInt = (long) (ip4.destinationToInt() & 0xffffffffl);
+						long destinationIpInt = (long) (ip4.destinationToInt() & 0xffffffffl);
 						int protocol = ip4.type();
 						int sourcePort = 0;
 						int destinationPort = 0;
 						int ipLength = ip4.length();
-						Date date = new Date(packet.getCaptureHeader()
-								.timestampInMillis());
+						long date = packet.getCaptureHeader().timestampInMillis();
 
 						if (packet.hasHeader(tcp)) {
 							sourcePort = tcp.source();
@@ -75,10 +70,10 @@ public class PcapProducer {
 						}
 
 						String message = String.format(
-								"%s %d %s %d %d %d %d %d %s", sourceIp,
+								"%s %d %s %d %d %d %d %d %d", sourceIp,
 								sourceIpInt, destinationIp, destinationIpInt,
 								protocol, sourcePort, destinationPort,
-								ipLength, dateFormatter.format(date));
+								ipLength, date);
 						KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 								"netdata", message);
 						producer.send(data);
