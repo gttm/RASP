@@ -28,8 +28,11 @@ public class PcapProducer {
 		Properties props = new Properties();
 		props.put("metadata.broker.list", "master:9092");
 		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		// props.put("partitioner.class", "example.producer.SimplePartitioner");
-		props.put("request.required.acks", "1");
+		props.put("batch.num.messages", "20");
+		props.put("queue.buffering.max.ms", "5000");
+		//props.put("partitioner.class", "example.producer.SimplePartitioner");
+		//props.put("producer.type", "async");
+		//props.put("request.required.acks", "1");
 		ProducerConfig config = new ProducerConfig(props);
 		final Producer<String, String> producer = new Producer<String, String>(
 				config);
