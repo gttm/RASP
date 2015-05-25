@@ -31,6 +31,8 @@ import gr.gttm.bolt.TotalRankingsBolt;
 
 public class NetDataTopology {
 	private static final int TOP_N = 5;
+	private static final int WINDOW_LENGTH = 30;
+	private static final int EMIT_FREQUENCY = 10;
 
 	public static void main(String[] args) throws Exception {
 		BrokerHosts brokerHosts = new ZkHosts("master:2181");
@@ -40,15 +42,15 @@ public class NetDataTopology {
 
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("netDataLine", new KafkaSpout(kafkaConfig), 2);
-		builder.setBolt("netDataFields", new SplitFieldsBolt(), 20)
+		builder.setBolt("netDataFields", new SplitFieldsBolt(), 30)
 				.shuffleGrouping("netDataLine");
 
-		builder.setBolt("portCounter", new RollingCountBolt(30, 10), 20)
+		builder.setBolt("portCounter", new RollingCountBolt(WINDOW_LENGTH, EMIT_FREQUENCY), 20)
 				.fieldsGrouping("netDataFields", "portStream", new Fields("port"));
 		builder.setBolt("intermediatePortRanker",
-				new IntermediateRankingsBolt(TOP_N), 10).fieldsGrouping(
+				new IntermediateRankingsBolt(TOP_N, EMIT_FREQUENCY), 10).fieldsGrouping(
 				"portCounter", new Fields("obj"));
-		builder.setBolt("topPorts", new TotalRankingsBolt(TOP_N, 10))
+		builder.setBolt("topPorts", new TotalRankingsBolt(TOP_N, EMIT_FREQUENCY))
 				.globalGrouping("intermediatePortRanker");
 
 		SyncPolicy syncPolicy = new CountSyncPolicy(1);

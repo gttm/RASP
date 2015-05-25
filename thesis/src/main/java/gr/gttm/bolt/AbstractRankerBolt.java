@@ -31,7 +31,7 @@ public abstract class AbstractRankerBolt extends BaseBasicBolt {
 
   private final int emitFrequencyInSeconds;
   private final int count;
-  private final Rankings rankings;
+  private Rankings rankings;
 
   public AbstractRankerBolt() {
     this(DEFAULT_COUNT, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
@@ -66,6 +66,8 @@ public abstract class AbstractRankerBolt extends BaseBasicBolt {
     if (TupleHelpers.isTickTuple(tuple)) {
       getLogger().debug("Received tick tuple, triggering emit of current rankings");
       emitRankings(collector);
+      // flush old rankings after they are emitted
+      rankings = new Rankings(count);
     }
     else {
       updateRankingsWithTuple(tuple);

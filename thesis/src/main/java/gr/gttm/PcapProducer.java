@@ -61,7 +61,7 @@ public class PcapProducer {
 						int protocol = ip4.type();
 						int sourcePort = 0;
 						int destinationPort = 0;
-						int ipLength = ip4.length();
+						int ipSize = ip4.length();
 						long date = packet.getCaptureHeader().timestampInMillis();
 
 						if (packet.hasHeader(tcp)) {
@@ -76,7 +76,7 @@ public class PcapProducer {
 								"%s %d %s %d %d %d %d %d %d", sourceIp,
 								sourceIpInt, destinationIp, destinationIpInt,
 								protocol, sourcePort, destinationPort,
-								ipLength, date);
+								ipSize, date);
 						KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 								"netdata", message);
 						producer.send(data);
