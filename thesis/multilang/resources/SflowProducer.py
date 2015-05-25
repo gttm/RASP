@@ -23,8 +23,8 @@ for line in sflowToolProc.stdout:
         protocol = fields[11]
         sourcePort = fields[14]
         destinationPort = fields[15]
-        ipLength = fields[17]
+        ipSize = fields[17]
         date = int(time.time())
-        message = "{} {} {} {} {} {} {} {} {}".format(sourceIp, sourceIpInt, destinationIp, destinationIpInt, protocol, sourcePort, destinationPort, ipLength, date)
+        message = "{} {} {} {} {} {} {} {} {}".format(sourceIp, sourceIpInt, destinationIp, destinationIpInt, protocol, sourcePort, destinationPort, ipSize, date)
         #print message
         producer.send_messages("netdata", message)

@@ -17,16 +17,17 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
 import storm.kafka.ZkHosts;
+
 import gr.gttm.bolt.SplitFieldsBolt;
 import gr.gttm.bolt.IntermediateRankingsBolt;
 import gr.gttm.bolt.RollingCountBolt;
 import gr.gttm.bolt.TotalRankingsBolt;
-import gr.gttm.tools.GetPortsBolt;
 
 public class NetDataTopology {
 	private static final int TOP_N = 5;
@@ -42,10 +43,8 @@ public class NetDataTopology {
 		builder.setBolt("netDataFields", new SplitFieldsBolt(), 20)
 				.shuffleGrouping("netDataLine");
 
-		builder.setBolt("port", new GetPortsBolt(), 20).shuffleGrouping(
-				"netDataFields");
 		builder.setBolt("portCounter", new RollingCountBolt(30, 10), 20)
-				.fieldsGrouping("port", new Fields("port"));
+				.fieldsGrouping("netDataFields", "portStream", new Fields("port"));
 		builder.setBolt("intermediatePortRanker",
 				new IntermediateRankingsBolt(TOP_N), 10).fieldsGrouping(
 				"portCounter", new Fields("obj"));
