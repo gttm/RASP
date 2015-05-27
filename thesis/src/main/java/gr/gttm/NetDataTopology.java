@@ -17,13 +17,12 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
 import storm.kafka.SpoutConfig;
 import storm.kafka.StringScheme;
 import storm.kafka.ZkHosts;
-
+import gr.gttm.bolt.IPToASBolt;
 import gr.gttm.bolt.SplitFieldsBolt;
 import gr.gttm.bolt.IntermediateRankingsBolt;
 import gr.gttm.bolt.RollingCountBolt;
@@ -45,11 +44,13 @@ public class NetDataTopology {
 		builder.setBolt("netDataFields", new SplitFieldsBolt(), 30)
 				.shuffleGrouping("netDataLine");
 
+		// Rolling count ports branch
+		
 		builder.setBolt("portCounter", new RollingCountBolt(WINDOW_LENGTH, EMIT_FREQUENCY), 20)
 				.fieldsGrouping("netDataFields", "portStream", new Fields("port"));
 		builder.setBolt("intermediatePortRanker",
 				new IntermediateRankingsBolt(TOP_N, EMIT_FREQUENCY), 10).fieldsGrouping(
-				"portCounter", new Fields("obj"));
+						"portCounter", new Fields("obj"));
 		builder.setBolt("topPorts", new TotalRankingsBolt(TOP_N, EMIT_FREQUENCY))
 				.globalGrouping("intermediatePortRanker");
 
@@ -69,6 +70,17 @@ public class NetDataTopology {
 				.addRotationAction(new MoveFileAction()
 						.toDestination("/storm/netdata/topPorts/archive"));
 		builder.setBolt("portsHdfs", portsHdfsBolt).shuffleGrouping("topPorts");
+		
+		// IP to AS branch
+		builder.setBolt("ipPairToASPair", new IPToASBolt(), 10)
+				.shuffleGrouping("netDataFields", "ipIntStream");
+		builder.setBolt("asPairCounter", new RollingCountBolt(WINDOW_LENGTH, EMIT_FREQUENCY), 20)
+				.fieldsGrouping("ipPairToASPair", new Fields("asPair"));
+		builder.setBolt("intermediateASPairRanker",
+				new IntermediateRankingsBolt(TOP_N, EMIT_FREQUENCY), 5).fieldsGrouping(
+						"asPairCounter", new Fields("obj"));
+		builder.setBolt("topASPairs", new TotalRankingsBolt(TOP_N, EMIT_FREQUENCY))
+				.globalGrouping("intermediateASPairRanker");
 
 		Config conf = new Config();
 		conf.setDebug(true);

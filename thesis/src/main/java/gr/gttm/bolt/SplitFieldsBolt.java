@@ -1,5 +1,7 @@
 package gr.gttm.bolt;
 
+import gr.gttm.util.NetDataHelpers;
+
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -17,32 +19,27 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 
 		if (fields.length == 7) {
 			String sourceIp = fields[0];
-			long sourceIpInt = ipToInt(sourceIp);
+			long sourceIpInt = NetDataHelpers.ipToInt(sourceIp);
 			String destinationIp = fields[1];
-			long destinationIpInt = ipToInt(destinationIp);
+			long destinationIpInt = NetDataHelpers.ipToInt(destinationIp);
 			String protocol = fields[2];
 			String sourcePort = fields[3];
 			String destinationPort = fields[4];
 			String ipSize = fields[5];
 			String date = fields[6];
-			
+
 			// default stream
-			collector.emit(new Values(sourceIp, sourceIpInt,
-					destinationIp, destinationIpInt, protocol,
-					sourcePort, destinationPort, ipSize, date));
-			
+			collector.emit(new Values(sourceIp, sourceIpInt, destinationIp,
+					destinationIpInt, protocol, sourcePort, destinationPort,
+					ipSize, date));
+
 			// stream portStream
 			collector.emit("portStream", new Values(sourcePort));
 			collector.emit("portStream", new Values(destinationPort));
-		}
-	}
 
-	public long ipToInt(String ipString) {
-		String[] ipOctets = ipString.split("\\.");
-		return Long.parseLong(ipOctets[0]) * 16777216
-				+ Long.parseLong(ipOctets[1]) * 65536
-				+ Long.parseLong(ipOctets[2]) * 256
-				+ Long.parseLong(ipOctets[3]);
+			// stream ipIntStream
+			collector.emit("ipIntStream", new Values(sourceIpInt, destinationIpInt));
+		}
 	}
 
 	@Override
@@ -51,5 +48,6 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 				"destinationIpInt", "protocol", "sourcePort",
 				"destinationPort", "ipSize", "date"));
 		declarer.declareStream("portStream", new Fields("port"));
+		declarer.declareStream("ipIntStream", new Fields("sourceIpInt", "destinationIpInt"));
 	}
 }
