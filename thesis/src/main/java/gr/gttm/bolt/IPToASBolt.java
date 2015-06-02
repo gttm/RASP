@@ -71,7 +71,7 @@ public class IPToASBolt extends BaseBasicBolt {
 	}
 	
 	private String ipToAS(long ipInt) {
-		String as = "Undefined AS";
+		String as = "null";
 		Long key = asMap.ceilingKey(ipInt);		
 		if (key != null) {
 			String[] value = asMap.get(key);
