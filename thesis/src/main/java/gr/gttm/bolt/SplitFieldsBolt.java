@@ -18,36 +18,26 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 		String[] fields = line.split(",");
 
 		if (fields.length == 7) {
-			String sourceIp = fields[0];
-			long sourceIpInt = NetDataHelpers.ipToInt(sourceIp);
-			String destinationIp = fields[1];
-			long destinationIpInt = NetDataHelpers.ipToInt(destinationIp);
+			String sourceIP = fields[0];
+			long sourceIPInt = NetDataHelpers.ipToInt(sourceIP);
+			String destinationIP = fields[1];
+			long destinationIPInt = NetDataHelpers.ipToInt(destinationIP);
 			String protocol = fields[2];
 			String sourcePort = fields[3];
 			String destinationPort = fields[4];
 			String ipSize = fields[5];
 			String dateTime = fields[6];
 
-			// default stream
-			collector.emit(new Values(sourceIp, sourceIpInt, destinationIp,
-					destinationIpInt, protocol, sourcePort, destinationPort,
+			collector.emit(new Values(sourceIP, sourceIPInt, destinationIP,
+					destinationIPInt, protocol, sourcePort, destinationPort,
 					ipSize, dateTime));
-
-			// stream portStream
-			collector.emit("portStream", new Values(sourcePort));
-			collector.emit("portStream", new Values(destinationPort));
-
-			// stream ipIntStream
-			collector.emit("ipIntStream", new Values(sourceIpInt, destinationIpInt));
 		}
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("sourceIp", "sourceIpInt", "destinationIp",
-				"destinationIpInt", "protocol", "sourcePort",
+		declarer.declare(new Fields("sourceIP", "sourceIPInt", "destinationIP",
+				"destinationIPInt", "protocol", "sourcePort",
 				"destinationPort", "ipSize", "dateTime"));
-		declarer.declareStream("portStream", new Fields("port"));
-		declarer.declareStream("ipIntStream", new Fields("sourceIpInt", "destinationIpInt"));
 	}
 }

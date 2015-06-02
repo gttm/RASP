@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -60,9 +61,13 @@ public class IPToASBolt extends BaseBasicBolt {
 
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
-		long sourceIpInt = tuple.getLong(0);
-		long destinationIpInt = tuple.getLong(1);
-		collector.emit(new Values(ipToAS(sourceIpInt) + ", " + ipToAS(destinationIpInt)));
+		long sourceIPInt = tuple.getLongByField("sourceIPInt");
+		long destinationIPInt = tuple.getLongByField("destinationIPInt");
+		List<Object> outputValues = tuple.getValues();
+		outputValues.add(ipToAS(sourceIPInt));
+		outputValues.add(ipToAS(destinationIPInt));
+		
+		collector.emit(new Values(outputValues.toArray()));
 	}
 	
 	private String ipToAS(long ipInt) {
@@ -79,6 +84,9 @@ public class IPToASBolt extends BaseBasicBolt {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("asPair"));
+		declarer.declare(new Fields("sourceIP", "sourceIPInt", "destinationIP",
+				"destinationIPInt", "protocol", "sourcePort",
+				"destinationPort", "ipSize", "dateTime", "sourceAS",
+				"destinationAS"));
 	}
 }
