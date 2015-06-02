@@ -67,6 +67,8 @@ public class IPToDNSBolt extends BaseBasicBolt {
 			byte[] value = res.getValue(Bytes.toBytes("d"),
 					Bytes.toBytes("dns"));
 			dns = Bytes.toString(value);
+			if (dns == null)
+				dns = "null";
 		} catch (IOException e) {
 			LOG.error("Failed to get row");
 			e.printStackTrace();
