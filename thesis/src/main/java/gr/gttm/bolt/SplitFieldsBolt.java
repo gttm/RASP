@@ -15,7 +15,7 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
 		String line = tuple.getString(0);
-		String[] fields = line.split(" ");
+		String[] fields = line.split(",");
 
 		if (fields.length == 7) {
 			String sourceIp = fields[0];
@@ -26,12 +26,12 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 			String sourcePort = fields[3];
 			String destinationPort = fields[4];
 			String ipSize = fields[5];
-			String date = fields[6];
+			String dateTime = fields[6];
 
 			// default stream
 			collector.emit(new Values(sourceIp, sourceIpInt, destinationIp,
 					destinationIpInt, protocol, sourcePort, destinationPort,
-					ipSize, date));
+					ipSize, dateTime));
 
 			// stream portStream
 			collector.emit("portStream", new Values(sourcePort));
@@ -46,7 +46,7 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields("sourceIp", "sourceIpInt", "destinationIp",
 				"destinationIpInt", "protocol", "sourcePort",
-				"destinationPort", "ipSize", "date"));
+				"destinationPort", "ipSize", "dateTime"));
 		declarer.declareStream("portStream", new Fields("port"));
 		declarer.declareStream("ipIntStream", new Fields("sourceIpInt", "destinationIpInt"));
 	}

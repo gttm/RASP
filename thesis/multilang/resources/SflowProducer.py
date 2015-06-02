@@ -4,8 +4,9 @@ import time
 import subprocess
 from kafka import SimpleProducer, KafkaClient
 
-kafka = KafkaClient("master:9092")
-producer = SimpleProducer(kafka, batch_send=True, batch_send_every_n=20, batch_send_every_t=5)
+brokerList = ["slave5:9092", "slave6:9092"]
+kafka = KafkaClient(brokerList)
+producer = SimpleProducer(kafka, batch_send=True, batch_send_every_n=100, batch_send_every_t=5)
 
 sflowToolProc = subprocess.Popen("sflowtool -l".split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -17,8 +18,8 @@ for line in sflowToolProc.stdout:
         protocol = fields[11]
         sourcePort = fields[14]
         destinationPort = fields[15]
-        ipLength = fields[17]
-        date = int(time.time())
-        message = "{} {} {} {} {} {} {}".format(sourceIp, destinationIp, protocol, sourcePort, destinationPort, ipLength, date)
+        ipSize = fields[17]
+        dateTime = int(time.time()*1000000)
+        message = "{},{},{},{},{},{},{}".format(sourceIp, destinationIp, protocol, sourcePort, destinationPort, ipSize, dateTime)
         #print message
         producer.send_messages("netdata", message)

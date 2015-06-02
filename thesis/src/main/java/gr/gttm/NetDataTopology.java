@@ -34,7 +34,7 @@ public class NetDataTopology {
 	private static final int EMIT_FREQUENCY = 10;
 
 	public static void main(String[] args) throws Exception {
-		BrokerHosts brokerHosts = new ZkHosts("master:2181");
+		BrokerHosts brokerHosts = new ZkHosts("zookeeper:2181");
 		SpoutConfig kafkaConfig = new SpoutConfig(brokerHosts, "netdata",
 				"/netdata", "storm");
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
@@ -45,7 +45,6 @@ public class NetDataTopology {
 				.shuffleGrouping("netDataLine");
 
 		// Rolling count ports branch
-		
 		builder.setBolt("portCounter", new RollingCountBolt(WINDOW_LENGTH, EMIT_FREQUENCY), 20)
 				.fieldsGrouping("netDataFields", "portStream", new Fields("port"));
 		builder.setBolt("intermediatePortRanker",
