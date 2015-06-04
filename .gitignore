@@ -1,6 +1,12 @@
+# Eclipse
 .classpath
 .project
 .pydevproject
 .settings/
+
+# Maven
 target/
 bin/
+
+# Windows
+Thumbs.db
