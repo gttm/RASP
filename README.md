@@ -1,2 +1,2 @@
-# Thesis
-Real-time network data processing
+# Datix-Realtime
+A system for scalable real-time network analytics

@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>gr.gttm</groupId>
-    <artifactId>thesis</artifactId>
+    <artifactId>datix-topology</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>thesis</name>
+    <name>datix-topology</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -30,17 +30,17 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>storm</groupId>
             <artifactId>storm</artifactId>
             <version>0.9.0.1</version>
             <!-- Keep storm out of the jar -->
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.storm</groupId>
-            <artifactId>storm-kafka</artifactId>
-            <version>0.9.4</version>
         </dependency>
 
         <dependency>
@@ -56,17 +56,9 @@
         </dependency>
 
         <dependency>
-            <groupId>jnetpcap</groupId>
-            <artifactId>jnetpcap</artifactId>
-            <version>1.3.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/jnetpcap.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
+            <groupId>org.apache.storm</groupId>
+            <artifactId>storm-kafka</artifactId>
+            <version>0.9.4</version>
         </dependency>
 
         <dependency>

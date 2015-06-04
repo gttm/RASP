@@ -21,7 +21,7 @@ import gr.gttm.bolt.IPToASBolt;
 import gr.gttm.bolt.IPToDNSBolt;
 import gr.gttm.bolt.SplitFieldsBolt;
 
-public class NetDataTopology {
+public class DatixTopology {
 
 	public static void main(String[] args) throws Exception {
 		// Input from kafka and fields preprocessing
@@ -68,7 +68,7 @@ public class NetDataTopology {
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 60);
 		conf.put("hbase.conf", hbConf);
 
-		StormSubmitter.submitTopology("NetDataTopology", conf,
+		StormSubmitter.submitTopology("DatixTopology", conf,
 				builder.createTopology());
 	}
 }

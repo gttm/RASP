@@ -26,9 +26,9 @@ public class PcapProducer {
 		StringBuilder errbuf = new StringBuilder();
 
 		Properties props = new Properties();
-		props.put("metadata.broker.list", "master:9092");
+		props.put("metadata.broker.list", "slave5:9092,slave6:9092");
 		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("batch.num.messages", "20");
+		props.put("batch.num.messages", "100");
 		props.put("queue.buffering.max.ms", "5000");
 		//props.put("partitioner.class", "example.producer.SimplePartitioner");
 		//props.put("producer.type", "async");
