@@ -1,7 +1,5 @@
 package gr.gttm.bolt;
 
-import gr.gttm.util.NetDataHelpers;
-
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -19,9 +17,9 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 
 		if (fields.length == 7) {
 			String sourceIP = fields[0];
-			long sourceIPInt = NetDataHelpers.ipToInt(sourceIP);
+			long sourceIPInt = ipToInt(sourceIP);
 			String destinationIP = fields[1];
-			long destinationIPInt = NetDataHelpers.ipToInt(destinationIP);
+			long destinationIPInt = ipToInt(destinationIP);
 			String protocol = fields[2];
 			String sourcePort = fields[3];
 			String destinationPort = fields[4];
@@ -32,6 +30,14 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 					destinationIPInt, protocol, sourcePort, destinationPort,
 					ipSize, dateTime));
 		}
+	}
+	
+	private long ipToInt(String ipString) {
+		String[] ipOctets = ipString.split("\\.");
+		return Long.parseLong(ipOctets[0]) * 16777216
+				+ Long.parseLong(ipOctets[1]) * 65536
+				+ Long.parseLong(ipOctets[2]) * 256
+				+ Long.parseLong(ipOctets[3]);
 	}
 
 	@Override

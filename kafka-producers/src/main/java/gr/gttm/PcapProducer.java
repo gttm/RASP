@@ -1,6 +1,7 @@
 package gr.gttm;
 
 import java.util.Properties;
+import java.util.Random;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -48,6 +49,7 @@ public class PcapProducer {
 				Ip4 ip4 = new Ip4();
 				Tcp tcp = new Tcp();
 				Udp udp = new Udp();
+				Random rand = new Random();
 
 				public void nextPacket(JPacket packet, StringBuilder errbuf) {
 					if (packet.hasHeader(ip4)
@@ -62,7 +64,7 @@ public class PcapProducer {
 						int sourcePort = 0;
 						int destinationPort = 0;
 						int ipSize = ip4.length();
-						long date = packet.getCaptureHeader().timestampInMillis();
+						long dateTime = System.currentTimeMillis()*1000 + rand.nextInt(1000);
 
 						if (packet.hasHeader(tcp)) {
 							sourcePort = tcp.source();
@@ -73,10 +75,10 @@ public class PcapProducer {
 						}
 
 						String message = String.format(
-								"%s %d %s %d %d %d %d %d %d", sourceIp,
+								"%s,%d,%s,%d,%d,%d,%d,%d,%d", sourceIp,
 								sourceIpInt, destinationIp, destinationIpInt,
 								protocol, sourcePort, destinationPort,
-								ipSize, date);
+								ipSize, dateTime);
 						KeyedMessage<String, String> data = new KeyedMessage<String, String>(
 								"netdata", message);
 						producer.send(data);

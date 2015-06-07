@@ -31,16 +31,16 @@ public class DatixTopology {
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("netDataLine", new KafkaSpout(kafkaConfig), 1);
-		builder.setBolt("netDataFields", new SplitFieldsBolt(), 1)
+		builder.setSpout("netDataLine", new KafkaSpout(kafkaConfig), 2);
+		builder.setBolt("netDataFields", new SplitFieldsBolt(), 2)
 				.shuffleGrouping("netDataLine");
 		
 		// IP to AS
-		builder.setBolt("ipToAS", new IPToASBolt(), 1)
+		builder.setBolt("ipToAS", new IPToASBolt(), 2)
 				.shuffleGrouping("netDataFields");
 		
 		// IP to DNS
-		builder.setBolt("ipToDNS", new IPToDNSBolt(), 1)
+		builder.setBolt("ipToDNS", new IPToDNSBolt(), 6)
 				.shuffleGrouping("ipToAS");
 		
 		// Output to hbase
@@ -59,13 +59,14 @@ public class DatixTopology {
 
 		HBaseBolt hbaseBolt = new HBaseBolt("output", mapper)
 				.withConfigKey("hbase.conf");
-		builder.setBolt("output", hbaseBolt, 1).shuffleGrouping("ipToDNS");
+		builder.setBolt("output", hbaseBolt, 6).shuffleGrouping("ipToDNS");
 
 		Config conf = new Config();
 		conf.setDebug(true);
 		conf.setNumWorkers(4);
 		conf.setNumAckers(4);
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 60);
+		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 2000);
 		conf.put("hbase.conf", hbConf);
 
 		StormSubmitter.submitTopology("DatixTopology", conf,
