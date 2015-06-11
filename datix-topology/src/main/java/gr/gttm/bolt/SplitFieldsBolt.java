@@ -20,11 +20,11 @@ public class SplitFieldsBolt extends BaseBasicBolt {
 			long sourceIPInt = ipToInt(sourceIP);
 			String destinationIP = fields[1];
 			long destinationIPInt = ipToInt(destinationIP);
-			String protocol = fields[2];
-			String sourcePort = fields[3];
-			String destinationPort = fields[4];
-			String ipSize = fields[5];
-			String dateTime = fields[6];
+			short protocol = Short.parseShort(fields[2]);
+			int sourcePort = Integer.parseInt(fields[3]);
+			int destinationPort = Integer.parseInt(fields[4]);
+			int ipSize = Integer.parseInt(fields[5]);
+			long dateTime = Long.parseLong(fields[6]);
 
 			collector.emit(new Values(sourceIP, sourceIPInt, destinationIP,
 					destinationIPInt, protocol, sourcePort, destinationPort,
