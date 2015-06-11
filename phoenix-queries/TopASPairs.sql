@@ -1,6 +1,6 @@
-SELECT "sourceAS", "destinationAS", COUNT(*) AS "pairCount" 
-FROM "output" 
-WHERE "dateTime" > '1433690000' AND "dateTime" < '1433693600'
-GROUP BY "sourceAS", "destinationAS" 
+SELECT "as"."asS", "as"."asD", COUNT(1) AS "pairCount" 
+FROM "netdata" 
+WHERE "time" > 1434017860
+GROUP BY "as"."asS", "as"."asD" 
 ORDER BY "pairCount" DESC 
 LIMIT 10;

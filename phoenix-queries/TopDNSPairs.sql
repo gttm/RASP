@@ -1,6 +1,6 @@
-SELECT "sourceDNS", "destinationDNS", COUNT(*) AS "pairCount" 
-FROM "output" 
-WHERE "dateTime" > '1433690000' AND "dateTime" < '1433693600'
-GROUP BY "sourceDNS", "destinationDNS" 
+SELECT "dns"."dnsS", "dns"."dnsD", COUNT(1) AS "pairCount" 
+FROM "netdata" 
+WHERE "time" > 1434017860
+GROUP BY "dns"."dnsS", "dns"."dnsD" 
 ORDER BY "pairCount" DESC 
 LIMIT 10;
