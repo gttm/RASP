@@ -53,12 +53,10 @@ public class DatixTopology {
 		builder.setBolt("output", phoenixBolt, 6).shuffleGrouping("ipToDNS");
 
 		Config conf = new Config();
-		conf.setDebug(true);
 		conf.setNumWorkers(4);
 		conf.setNumAckers(4);
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 60);
-		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 6000);
-		//conf.put("hbase.conf", hbConf);
+		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 1000);
 
 		StormSubmitter.submitTopology("DatixTopology", conf,
 				builder.createTopology());

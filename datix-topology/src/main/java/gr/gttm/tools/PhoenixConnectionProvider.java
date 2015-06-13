@@ -14,17 +14,30 @@ public class PhoenixConnectionProvider implements ConnectionProvider {
 	
     @Override
     public void prepare() {
-    	try {
-    		connection = DriverManager.getConnection("jdbc:phoenix:zookeeper");
-		} catch (SQLException e) {
-			LOG.error("Failed to get phoenix connection");
-			e.printStackTrace();
-		}
+    	this.connection = newConnection();
     }
 
     @Override
     public Connection getConnection() {
+    	try {
+			if ((this.connection == null) || ! this.connection.isValid(30) ) {
+				this.connection = newConnection();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     	return this.connection;
+    }
+    
+    private Connection newConnection() {
+    	Connection newConnection = null;
+    	try {
+    		newConnection = DriverManager.getConnection("jdbc:phoenix:zookeeper");
+		} catch (SQLException e) {
+			LOG.error("Failed to get phoenix connection");
+			e.printStackTrace();
+		}
+    	return newConnection;
     }
 
     @Override
