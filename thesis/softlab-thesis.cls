@@ -279,8 +279,8 @@
 %\def\font@sans{Liberation Sans}
 
 % typewriter font
-%\def\font@tt{Liberation Mono}
-\def\font@tt{DejaVu Sans Mono}
+\def\font@tt{Liberation Mono}
+%\def\font@tt{DejaVu Sans Mono}
 %\def\font@tt{Lucida Sans Typewriter}
 %\def\font@tt{Free Monospaced}
 %\def\font@tt{Bitstream Vera Sans Mono}
