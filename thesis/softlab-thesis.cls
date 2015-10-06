@@ -1470,18 +1470,18 @@
     \@author, \\[6pt]
     \@locationgr, \@date@defense
   \end{flushright}
-  \footacknowledgement{%
-    Η εργασία αυτή είναι επίσης διαθέσιμη ως Τεχνική Αναφορά
-    \@TRnumber, Εθνικό Μετσόβιο Πολυτεχνείο, Σχολή Ηλεκτρολόγων
-    Μηχανικών και Μηχανικών Υπολογιστών, Τομέας Τεχνολογίας
-    Πληροφορικής και Υπολογιστών, Εργαστήριο Τεχνολογίας
-    Λογισμικού, \@date.
-    \\[6pt]
-    \begin{tabular}{@{}ll@{}}
-    URL: & \texttt{http://www.softlab.ntua.gr/techrep/} \\
-    FTP: & \texttt{ftp://ftp.softlab.ntua.gr/pub/techrep/}
-    \end{tabular}
-  }
+  %\footacknowledgement{%
+  %  Η εργασία αυτή είναι επίσης διαθέσιμη ως Τεχνική Αναφορά
+  %  \@TRnumber, Εθνικό Μετσόβιο Πολυτεχνείο, Σχολή Ηλεκτρολόγων
+  %  Μηχανικών και Μηχανικών Υπολογιστών, Τομέας Τεχνολογίας
+  %  Πληροφορικής και Υπολογιστών, Εργαστήριο Τεχνολογίας
+  %  Λογισμικού, \@date.
+  %  \\[6pt]
+  %  \begin{tabular}{@{}ll@{}}
+  %  URL: & \texttt{http://www.softlab.ntua.gr/techrep/} \\
+  %  FTP: & \texttt{ftp://ftp.softlab.ntua.gr/pub/techrep/}
+  %  \end{tabular}
+  %}
   \newpage%
   \endgroup%
   \end{greek}%
@@ -1517,9 +1517,9 @@
 
 % Font customization
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\institutionfont{\LARGE\scshape}
-\schoolfont{\Large\scshape}
-\departmentfont{\Large\scshape}
+\institutionfont{\LARGE}
+\schoolfont{\Large}
+\departmentfont{\Large}
 \titlefont{\LARGE\bfseries}
 \authorfont{\Large\bfseries}
 \thesistypefont{\Large}

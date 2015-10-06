@@ -1,3 +1,5 @@
+\chapter{Theoretical Background}
+
 \section{Kafka}
 
 Kafka is a distributed, partitioned, replicated commit log service, that provides the functionality of a messaging system. It is used for collecting and delivering high volumes of data with low latency. Apache Kafka was originally developed by LinkedIn, and was subsequently open sourced in 2011. In 2012 Kafka became an Apache Top-Level Project.
@@ -17,7 +19,7 @@ The basic concepts of Kafka are the following:
 \label{figure:kafka_arch}
 \end{figure}
 
-For each topic, the Kafka cluster maintains a partitioned log with the structure depicted on Figure \ref{figure:kafka_topic}. A \emph{partition} is essentially a commit log to which an ordered, immutable sequence of messages that is continually appended. Every message is assigned an offset: a sequential id number that uniquely identifies the message within the partition. Kafka only provides a total order over messages within a partition, not between different partitions in a topic.
+For each topic, the Kafka cluster maintains a partitioned log with the structure depicted in Figure \ref{figure:kafka_topic}. A \emph{partition} is essentially a commit log to which an ordered, immutable sequence of messages that is continually appended. Every message is assigned an offset: a sequential id number that uniquely identifies the message within the partition. Kafka only provides a total order over messages within a partition, not between different partitions in a topic.
 
 \begin{figure}[H]
 \centering
@@ -28,9 +30,11 @@ For each topic, the Kafka cluster maintains a partitioned log with the structure
 
 All published messages remain stored at the brokers for a configurable period of time, whether or not they have been consumed. Kafka's performance is effectively constant with respect to data size, allowing a big volume of data to be retained. The only metadata retained for each consumer is the offset of the consumer in the log. By controlling this offset the consumer can read messages in any order. For example a consumer can advance its offset linearly as it reads messages or even reset to an older offset to reprocess them.
 
-The partitions in the log serve several purposes. Firstly, they allow the log to scale in size, by being distributed over the brokers of the cluster. Moreover, the partitions are replicated across a configurable number of brokers to provide fault tolerance. For each partition one broker acts as the "leader",  handling all the requests for the partition, and zero or more brokers act as "followers", replicating the leader. Finally, partitions act as the unit of parallelism and provide load balancing over the write and read requests of the producers and the consumers respectively.
+The partitions in the log serve several purposes. Firstly, they allow the log to scale in size, by being distributed over the brokers of the cluster. Moreover, the partitions are replicated across a configurable number of brokers to provide fault tolerance. For each partition one broker acts as the leader,  handling all the requests for the partition, and zero or more brokers act as followers, replicating the leader. Finally, partitions act as the unit of parallelism and provide load balancing over the write and read requests of the producers and the consumers respectively.
+
 
 \section{Storm}
+
 \subsection{Introduction}
 
 Storm is a real-time fault-tolerant and distributed stream data processing system. It was originally created by BackType and was subsequently open sourced after being acquired by Twitter in 2011. Storm is an Apache Top-Level Project since 2014. The basic Storm data processing architecture consists of streams of tuples flowing through topologies. A topology is a directed graph where the vertices represent computation and the edges represent the data flow between the computation components. Vertices are divided into spouts and bolts, that define information sources and manipulations respectively.
@@ -52,7 +56,7 @@ Every \emph{worker node} runs a \emph{Supervisor} daemon that listens for work a
 
 \begin{figure}[H]
 \centering
-\includegraphics{figures/storm_cluster}
+\includegraphics[width=0.8\textwidth]{figures/storm_cluster}
 \caption{Storm architecture}
 \label{figure:storm_cluster}
 \end{figure}
@@ -84,7 +88,7 @@ There are three main entities that are used to actually run a topology in a Stor
 
 \begin{figure}[H]
 \centering
-\includegraphics{figures/storm_parallelism}
+\includegraphics[width=0.8\textwidth]{figures/storm_parallelism}
 \caption{The relationships between worker processes, executors and tasks}
 \label{figure:storm_parallelism}
 \end{figure}
@@ -125,12 +129,14 @@ HDFS has a master/slave architecture. An HDFS cluster consists of a single NameN
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\textwidth]{figures/hdfs_architecture}
+\includegraphics[width=0.8\textwidth]{figures/hdfs_architecture}
 \caption{HDFS architecture}
 \label{figure:hdfs_architecture}
 \end{figure}
 
+
 \section{HBase}
+
 \subsection{Introduction}
 
 HBase is a distributed non-relational database modeled after Google's BigTable, that runs on top of the HDFS. It provides a fault-tolerant way of storing large quantities of sparse data, while allowing random, real-time access to them. HBase is an Apache Top-Level Project since 2010.
@@ -182,33 +188,35 @@ There are four primary data model operations in HBase:
 
 \subsection{HBase Architecture}
 
-In HBase, tables are are divided horizontally by row key range into \emph{Regions}. Regions are vertically divided by column families into \emph{Stores}, which are saved as files in HDFS (\emph{HFiles}). Figure \ref{figure:hbase_architecture} illustrates the architecture of HBase.
+In HBase, tables are are divided horizontally by row key range into \emph{regions}. Regions are vertically divided by column families into \emph{stores}, which are saved as files in HDFS (\emph{HFiles}). Figure \ref{figure:hbase_architecture} illustrates the architecture of HBase.
 
 \begin{figure}[H]
 \centering
-\includegraphics{figures/hbase_architecture}
+\includegraphics[width=0.8\textwidth]{figures/hbase_architecture}
 \caption{HBase architecture}
 \label{figure:hbase_architecture}
 \end{figure}
 
-An HBase cluster is composed of two types of servers in a master/slave type architecture. The \emph{HMaster} is responsible for monitoring all RegionServer instances in the cluster, and is the interface for all metadata changes. \emph{RegionServers} are responsible for serving and managing Regions. They are collocated with the HDFS DataNodes, which enables data locality for the data served by the RegionServers. HBase uses ZooKeeper as a distributed coordination service to maintain server state in the cluster. Zookeeper maintains which servers are alive and available, and provides server failure notification.
+An HBase cluster is composed of two types of servers in a master/slave type architecture. The \emph{HMaster} is responsible for monitoring all RegionServer instances in the cluster, and is the interface for all metadata changes. \emph{RegionServers} are responsible for serving and managing regions. They are collocated with the HDFS DataNodes, which enables data locality for the data served by the RegionServers. HBase uses ZooKeeper as a distributed coordination service to maintain server state in the cluster. Zookeeper maintains which servers are alive and available, and provides server failure notification.
 
 Every RegionServer has the following components:
 \begin{itemize}
 \item \textbf{WAL:} Write Ahead Log is used to store new data that hasn't yet been persisted to permanent storage. The WAL is used for recovery in the case of failure.
 \item \textbf{BlockCache:} Keeps data blocks resident in memory after they are read. Least Recently Used data is evicted when full.
-\item \textbf{MemStore:} Stores in-memory new data which has not yet been written to disk. There is one MemStore per column family per Region. Once the MemStore fills, its contents are written to disk as additional HFiles.
+\item \textbf{MemStore:} Stores in-memory new data which has not yet been written to disk. There is one MemStore per column family per region. Once the MemStore fills, its contents are written to disk as additional HFiles.
 \item \textbf{Hfile:} Stores the rows as sorted key-values on disk.
 \end{itemize}
 
 \begin{figure}[H]
 \centering
-\includegraphics{figures/hbase_regionserver_components}
+\includegraphics[width=0.8\textwidth]{figures/hbase_regionserver_components}
 \caption{RegionServer components}
 \label{figure:hbase_regionserver_components}
 \end{figure}
 
+
 \section{Phoenix}
+
 \subsection{Introduction}
 
 Apache Phoenix is relational database layer for HBase, targeting low latency queries over HBase data. Phoenix provides a JDBC driver that hides the intricacies of Hbase enabling users to create, delete, and alter SQL tables, views, indexes, and sequences, upsert and delete rows singly and in bulk and query data through SQL. Phoenix began as an internal project by the company Salesforce and was subsequently open-sourced and became a top-level Apache project on 2014.
@@ -233,15 +241,27 @@ On the server-size a Phoenix jar is installed in every RegionServer, allowing Ph
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\textwidth]{figures/phoenix_architecture}
+\includegraphics[width=0.8\textwidth]{figures/phoenix_architecture}
 \caption{Phoenix and HBase architecture}
 \label{figure:phoenix_architecture}
 \end{figure}
 
 \subsection{TopN Queries}
 
-TopN queries return the top N rows, where top is determined by the ORDER BY clause and N is defined by the LIMIT clause of the SQL query. The execution of this query needs to make a pass through all the rows restricted by the WHERE clause and sort the results of the GROUP BY, which is very computationally expensive  for large tables. In order to decrease execution time, Phoenix handles these queries in a different way, using an approximate algorithm described below.
+TopN queries return the top N rows, where top is determined by the \texttt{ORDER BY} clause and N is defined by the \texttt{LIMIT} clause of the SQL query. An example topN query for a pair of columns is presented below.
 
-Firstly, the Phoenix client issues parallel scans restricted by the WHERE clause of the query. The parallel scans are \emph{chunked} by region boundaries and guideposts. \emph{Guideposts} are a set of keys per Region per column family collected by Phoenix at an equal byte distance from each other, that act as hints to improve the parallelization of queries on their Region. The rows that satisfy the WHERE clause are grouped for each chunk in parallel on the server-side by the TopN coprocessor, according to the GROUP BY clause. The TopN coprocessor of each RegionServer keeps only the top N rows for each chunk. Afterwards, the Phoenix client receives the top N rows for each chunk, does a final merge sort and returns the top N rows.
+\begin{lstlisting}[language=PhoenixSQL]
+SELECT column1, column2, COUNT(*) AS pairCount
+FROM table
+WHERE column3 > 0
+GROUP BY column1, column2
+ORDER BY pairCount DESC
+LIMIT 10;
+\end{lstlisting}
+
+The execution of this query needs to make a pass through all the rows restricted by the \texttt{WHERE} clause and sort the results of the \texttt{GROUP BY}, which is very computationally expensive  for large tables. In order to decrease execution time, Phoenix handles these queries in a different way, using an approximate algorithm described below.
+
+Firstly, the Phoenix client issues parallel scans restricted by the \texttt{WHERE} clause of the query. The parallel scans are \emph{chunked} by region boundaries and guideposts. \emph{Guideposts} are a set of keys per region per column family collected by Phoenix at an equal byte distance from each other, that act as hints to improve the parallelization of queries on their region. The rows that satisfy the \texttt{WHERE} clause are grouped for each chunk in parallel on the server-side by the topN coprocessor, according to the \texttt{GROUP BY} clause. The topN coprocessor of each RegionServer keeps only the top N rows for each chunk. Afterwards, the Phoenix client receives the top N rows for each chunk, does a final merge sort and returns the top N rows.
+
 
 \cleardoublepage

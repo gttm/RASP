@@ -1,13 +1,152 @@
-\section{High Level Architecture}
+\chapter{System Description}
+
+TODO: All sections
+
+\section{System Overview}
+
+In this thesis we have developed a distributed system that performs real-time denormalization of a data stream by combining it with extenal datasets and stores the processed data in a format that enables the execution of low latency SQL queries. 
+
+At a high level, our system consists of 4 core components. 
+
+IPX Switch
+Sflow Agent: Samples packets from network interfaces.
+Kafka Producer: Extracts the useful information from the sflow packets and
+sends messages to the “netdata” Kafka topic (message format: “sourceIP,
+destinationIP, protocol, sourcePort, destinationPort, ipSize, dateTime”,
+where dateTime is the Unix Timestamp in microseconds since the packet was
+processed).
+
+Kafka cluster
+Kafka Brokers: Store messages in the topic “netdata” in replicated partitions.
+
+Storm topology
+Kafka Spout: Reads messages from the Kafka topic “netdata” and emits them
+as storm tuples.
+Split Fields Bolt: Splits the fields of each message and emits them to the next
+bolt (fields: sourceIP, sourceIPInt, destinationIP, destinationIPInt, protocol,
+sourcePort, destinationPort, ipSize, dateTime).
+IP to As Bolt: Reads the IP to AS file from HDFS and creates a TreeMap on
+initialization. Calculates the sourceAS, destinationAS for each message using
+the TreeMap and appends them to the emitted values.
+IP to DNS Bolt: Calculates the sourceDNS, destinationDNS for each message
+using Get() on the “rdns” hbase table and appends them to the emitted
+values.
+Phoenix Bolt: Inserts the tuple fields calculated by the previous bolts
+(sourceIP, sourceIPInt, destinationIP, destinationIPInt, protocol, sourcePort,
+destinationPort, ipSize, dateTime, sourceAS, destinationAS, sourceDNS,
+destinationDNS) into the “netdata” Phoenix table.
+
+Hadoop cluster
+HDFS: Stores the IP to AS file.
+HBase: Stores the tables “rdns” (contains IP to DNS name information) and
+“netdata” (Phoenix table that stores the output of the storm topology).
+Phoenix Client
+Phoenix Client: Executes SQL queries on the “netdata” Phoenix table.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/system_overview}
+\caption{Storm architecture overview}
+\label{figure:system_overview}
+\end{figure}
+
+
+\section{Data Generation and Input}
+
+\subsection{IXP Switch}
 
 
 
-\section{System Components}
+\subsection{Kafka Producer}
 
 
 
-\section{Optimizations}
 
+\section{Kafka Topic}
+
+
+
+
+\section{Storm Topology}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/system_storm_topology}
+\caption{Storm topology overview}
+\label{figure:system_storm_topology}
+\end{figure}
+
+\subsection{Kafka Spout}
+
+
+
+\subsection{Split Fields Bolt}
+
+subsubsections for as/dns?
+
+\subsection{IP to AS Bolt}
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Function{prepare}{}
+\EndFunction
+\Function{execute}{tuple}
+\EndFunction
+\Function{ipToAS}{ipInt}
+\EndFunction
+\end{algorithmic}
+\caption{IP to AS Bolt}
+\label{algorithm:ip_to_as_bolt}
+\end{algorithm}
+
+\subsection{IP to DNS Bolt}
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Function{execute}{tuple}
+\EndFunction
+\Function{ipToDNS}{ipInt}
+\EndFunction
+\end{algorithmic}
+\caption{IP to DNS Bolt}
+\label{algorithm:ip_to_dns_bolt}
+\end{algorithm}
+
+\subsection{Phoenix Bolt}
+
+\begin{lstlisting}[language=PhoenixSQL]
+UPSERT INTO netdata VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+\end{lstlisting}
+
+\section{Phoenix Table}
+
+Small column family and column qualifier names: Having large column names causes a performance penalty each time the data is accessed and increases the data transferred from RegionServer to Phoenix Client.
+
+Phoenix data types: Usage of the appropriate data type for each column (BIGINT for dataTime, SMALLINT for protocol etc) reduces the size of each row, which leads to faster queries.
+
+Separate column families for AS/DNS: One common query type on the table netdata is selecting the top-N AS or DNS pairs over a period of time. Since only the column families needed for the query are cached, having separate column families containing AS, DNS and other information helps by reducing the data that have to be cached, thus reducing query latency.
+
+\begin{lstlisting}[language=PhoenixSQL]
+CREATE TABLE netdata (
+    t BIGINT PRIMARY KEY,
+    d.ipS VARCHAR,
+    d.ipSI BIGINT,
+    d.ipD VARCHAR,
+    d.ipDI BIGINT,
+    d.proto SMALLINT,
+    d.portS INTEGER,
+    d.portD INTEGER,
+    d.size INTEGER,
+    as.asS VARCHAR,
+    as.asD VARCHAR,
+    dns.dnsS VARCHAR,
+    dns.dnsD VARCHAR
+) 
+SALT_BUCKETS = 4,
+DEFAULT_COLUMN_FAMILY = 'd',
+DATA_BLOCK_ENCODING = 'NONE',
+COMPRESSION = 'SNAPPY';
+\end{lstlisting}
 
 
 \cleardoublepage

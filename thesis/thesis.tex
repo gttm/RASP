@@ -1,0 +1,112 @@
+\documentclass[diploma]{softlab-thesis}
+
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usepackage{listings}
+\lstdefinelanguage[]{PhoenixSQL}[]{SQL}{
+	alsoletter=.,
+	morekeywords={UPSERT, BIGINT, SALT_BUCKETS, DEFAULT_COLUMN_FAMILY, DATA_BLOCK_ENCODING, COMPRESSION}
+}
+\lstset{
+	basicstyle=\small\ttfamily,
+	breaklines=true,
+	frame=single
+}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!50!black},
+    citecolor={red!50!black},
+    urlcolor={blue!80!black}
+}
+
+%%%
+%%%  The document
+%%%
+
+\begin{document}
+
+%%%  Title page
+
+\frontmatter
+
+\title{Κατανεμημένη Αναλυτική Επεξεργασία Ροών Δικτυακών Δεδομένων σε Πραγματικό Χρόνο}
+\author{Γεώργιος Τουλούπας}
+\date{Οκτώβριος 2015}
+\datedefense{19}{10}{2015}
+
+\supervisor{Νεκτάριος Κοζύρης}
+\supervisorpos{Καθηγητής Ε.Μ.Π.}
+
+\committeeone{Νεκτάριος Κοζύρης}
+\committeeonepos{Καθηγητής Ε.Μ.Π.}
+\committeetwo{Νικόλαος Σ. Παπασπύρου}
+\committeetwopos{Αν. Καθηγητής Ε.Μ.Π.}
+\committeethree{Γεώργιος Γκούμας}
+\committeethreepos{Λέκτορας Ε.Μ.Π.}
+
+\maketitle
+
+
+%%%  Abstract, in Greek
+
+\input{abstract_gr}
+
+
+%%%  Abstract, in English
+
+\input{abstract_en}
+
+
+%%%  Acknowledgements
+
+\input{acknowledgements}
+
+
+%%%  Various tables
+
+\renewcommand{\contentsname}{Contents}
+\renewcommand{\listtablename}{List of Tables}
+\renewcommand{\listfigurename}{List of Figures}
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+
+%%%  Main part of the book
+
+\mainmatter
+
+\renewcommand{\chaptername}{Chapter}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\renewcommand{\pagesname}{Pages}
+\renewcommand{\refname}{References}
+\renewcommand{\bibname}{Bibliography}
+\renewcommand{\indexname}{Index}
+\renewcommand{\appendixname}{Appendix}
+
+\input{introduction}
+\input{theoretical_background}
+\input{system_description}
+\input{optimizations}
+\input{evaluation}
+\input{conclusion}
+
+%%%  Bibliography
+
+\bibliographystyle{plain}
+\bibliography{thesis}
+
+%%%  End of document
+
+\end{document}
