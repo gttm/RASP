@@ -265,7 +265,7 @@
 \RequirePackage{fontspec}
 \RequirePackage{xunicode}
 \RequirePackage{xltxtra}
-\defaultfontfeatures{Mapping=tex-text}
+\defaultfontfeatures{Ligatures=Common}
 
 % XeLaTeX fonts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
