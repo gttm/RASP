@@ -12,7 +12,7 @@ The basic concepts of Kafka are the following:
 \item A \emph{consumer} is a process that subscribes to one or more topics and processes the feed of published messages.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics{figures/kafka_arch}
 \caption{Kafka architecture}
@@ -21,7 +21,7 @@ The basic concepts of Kafka are the following:
 
 For each topic, the Kafka cluster maintains a partitioned log with the structure depicted in Figure \ref{figure:kafka_topic}. A \emph{partition} is essentially a commit log to which an ordered, immutable sequence of messages that is continually appended. Every message is assigned an offset: a sequential id number that uniquely identifies the message within the partition. Kafka only provides a total order over messages within a partition, not between different partitions in a topic.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics{figures/kafka_topic}
 \caption{Kafka topic structure}
@@ -54,7 +54,7 @@ A Storm cluster consists of one master node and one or more worker nodes. The \e
 
 Every \emph{worker node} runs a \emph{Supervisor} daemon that listens for work assigned to its machine and starts and stops \emph{worker processes} as necessary based on what Nimbus has assigned to it. Each worker process executes a subset of a topology.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/storm_cluster}
 \caption{Storm architecture}
@@ -73,7 +73,7 @@ A \emph{bolt} consumes any number of input streams, does some processing, and po
 
 Networks of spouts and bolts are packaged into a topology, which is the top-level abstraction is submitted to Storm clusters for execution. A \emph{topology} is a graph of stream transformations where each vertex is a spout or bolt. Edges in the graph indicate which bolts are subscribing to which streams. Topologies run indefinitely when deployed.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics{figures/storm_topology}
 \caption{Example storm topology}
@@ -86,7 +86,7 @@ Each component in a Storm topology (spout or bolt) executes in parallel. The deg
 
 There are three main entities that are used to actually run a topology in a Storm cluster: worker processes, executors and tasks \cite{storm_parallelism}. The relationships between them are illustrated in Figure \ref{figure:storm_parallelism}.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/storm_parallelism}
 \caption{The relationships between worker processes, executors and tasks}
@@ -103,7 +103,7 @@ A \emph{task} performs the actual data processing for a topology component. Each
 
 A \emph{stream grouping} defines how a stream between two components (spout to bolt or bolt to bolt) is partitioned among the tasks of each component. For example, the way tuples are emitted between the sets of tasks corresponding to Bolt A and Bolt B in Figure \ref{figure:storm_groupings} is defined by a stream grouping.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics{figures/storm_groupings}
 \caption{Task-level execution of a topology}
@@ -128,7 +128,7 @@ Each file on HDFS is stored as a sequence of blocks of the same size, except for
 
 The HDFS has a master/slave architecture. An HDFS cluster consists of a single NameNode and one DataNode per node in the cluster. The \emph{NameNode} is a master server that manages the file system namespace and regulates access to files by clients. Each \emph{DataNode} manages storage attached to the node that it run on. The HDFS exposes a file system namespace and allows user data to be stored in files. Every file is split into blocks that are stored in a set of DataNodes. The NameNode determines the mapping of blocks to DataNodes and executes file system namespace operations like opening, closing, and renaming files and directories. The DataNodes are responsible for serving read and write requests from the file system’s clients and also perform block creation, deletion, and replication upon instruction from the NameNode.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/hdfs_architecture}
 \caption{HDFS architecture}
@@ -149,7 +149,7 @@ HBase offers the following key features:
 \item \textbf{Automatic sharding of tables:} HBase tables are distributed on the cluster via regions, and regions are automatically split and redistributed as data grows.
 \item \textbf{Automatic failover support between RegionServers:} If a RegionServers fails, the regions it was hosting are reassigned between the available RegionServers.
 \item \textbf{Integration with Hadoop MapReduce:} HBase supports massively parallelized processing via MapReduce for using HBase as both source and sink.
-\item \textbf{Block Cache and Bloom Filters:} HBase supports a Block Cache and Bloom Filters for real-time queries.
+\item \textbf{BlockCache and Bloom filters:} HBase supports a BlockCache and Bloom filters for real-time queries.
 \end{itemize}
 
 \subsection{HBase Data Model}
@@ -171,7 +171,7 @@ The basic elements of the HBase data model and the relations between them are pr
 \item \emph{timestamp}: Values within a cell are versioned. A timestamp is written alongside each value, and is the identifier for a given version of a value.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics{figures/hbase_data_model}
 \caption{HBase data model}
@@ -190,7 +190,7 @@ There are four primary data model operations in HBase:
 
 In HBase, tables are are divided horizontally by row key range into \emph{Regions}. Regions are vertically divided by column families into \emph{Stores}, which are stored as files at the HDFS (\emph{HFiles}). Figure \ref{figure:hbase_architecture} illustrates the architecture of HBase.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/hbase_architecture}
 \caption{HBase architecture}
@@ -207,7 +207,7 @@ Every RegionServer has the following components:
 \item \textbf{Hfile:} Stores the rows as sorted key-values on disk.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/hbase_regionserver_components}
 \caption{RegionServer components}
@@ -239,7 +239,7 @@ On the client-side, Phoenix is a JDBC driver that hides an HBase client from the
 
 On the server-side, a Phoenix jar is installed in every RegionServer, allowing Phoenix to take advantage of coprocessors and custom filters that HBase provides in order to increase performance. Coprocessors perform operations on the server-side, thus minimizing client/server data transfer and custom filters prune data as close to the source as possible.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/phoenix_architecture}
 \caption{Phoenix and HBase architecture}

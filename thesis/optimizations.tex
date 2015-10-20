@@ -19,16 +19,16 @@ Between all of our compression options, Snappy \cite{snappy} is the most fitting
 
 Regarding data block encoding, Fast Diff \cite{hbase_reference} is enabled by default in HBase. The format in which non-encoded data are stored in the HFile often results in multiple similar keys for each row, as seen in Figure \ref{figure:optimizations_no_encoding}.
 
-\begin{figure}[H]
+Fast Diff works similar to Diff encoding, but uses a faster implementation. The most important feature of Diff encoding is an extra column which holds the length of the prefix shared between the current key and the previous key. In addition, the timestamp is stored as the difference from the previous row's timestamp, rather than being stored in full. Figure \ref{figure:optimizations_diff_encoding} shows the same data with Figure \ref{figure:optimizations_no_encoding} stored with Diff encoding.
+
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/optimizations_no_encoding}
 \caption{Column family stored with no encoding}
 \label{figure:optimizations_no_encoding}
 \end{figure}
 
-Fast Diff works similar to Diff encoding, but uses a faster implementation. The most important feature of Diff encoding is an extra column which holds the length of the prefix shared between the current key and the previous key. In addition, the timestamp is stored as the difference from the previous row's timestamp, rather than being stored in full. Figure \ref{figure:optimizations_diff_encoding} shows the same data with Figure \ref{figure:optimizations_no_encoding} stored with Diff encoding.
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{figures/optimizations_diff_encoding}
 \caption{Column family stored with Diff encoding}
@@ -55,17 +55,17 @@ Rows in HBase are sorted lexicographically by row key. The row key for the under
 
 However, monotonically increasing row keys are a common source of hotspotting \cite{salting_sematext}. When records with sequential keys are being written to HBase all writes hit one Region which is served by one RegionServer. This uneven write load distribution limits the write throughput to the capacity of a single RegionServer instead of making use of multiple nodes in the HBase cluster. In addition to that, hotspotting overwhelms the RegionServer responsible for hosting that Region, causing performance degradation and potentially leading to Region unavailability.
 
-\emph{Salting} the row key provides a way to mitigate the problem \cite{salting_phoenix,salting_sematext}. Salting refers to adding a randomly-assigned prefix to the row key, to cause it to sort differently than it otherwise would. The number of possible prefixes correspond to the number of Regions you want to spread the data across. For example we can salt the row key by using this:
+\emph{Salting} the row key provides a way to mitigate the problem \cite{salting_phoenix,salting_sematext}. Salting refers to adding a randomly-assigned prefix to the row key, to cause it to sort differently than it otherwise would. The number of possible prefixes correspond to the number of Regions you want to spread the data across. For example we can salt the row key by using the following:
 
-\begin{lstlisting}[language=C]
+\begin{lstlisting}[language=C,frame=none]
 newKey = (++index % BUCKETS_NUMBER) + originalKey
 \end{lstlisting}
 
 In this listing, the \texttt{newKey} is produced by prefixing the \texttt{originalKey} with a salt denoting the salt bucket. The salted records are be split into multiple buckets served by different RegionServers. The row keys of bucketed records are no longer in the original sequence, however records within in each bucket preserve their original sequence, as seen in Figure \ref{figure:optimizations_salting}.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.6\textwidth]{figures/optimizations_salting}
+\includegraphics[width=0.5\textwidth]{figures/optimizations_salting}
 \caption{HBase row key prefix salting}
 \label{figure:optimizations_salting}
 \end{figure}

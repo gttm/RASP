@@ -49,16 +49,18 @@ For the performance tuning experiments we create 10 virtual machines:
 \item \textbf{Kafka and HBase cluster:} The Kafka and HBase clusters are co-hosted on 4 virtual machines. Each machine runs a Kafka server, an HDFS DataNode and HRegionServer for HBase. The RegionServer is allowed to have 5 GB of maximum heap size. Kafka CPU usage is very low during all of the benchmarks (around 3\%), therefore co-hosting it with HBase does not interfere with performance.
 \end{itemize}
 
-\begin{figure}[H]
+The deployment diagram for the clusters is presented in Figure \ref{figure:benchmarks_cluster_deployment}. Each of the virtual machines has the specifications listed in Table \ref{table:benchmarks_cluster_hw_specs}. The versions of the software used in our experiments are listed in Table \ref{table:benchmarks_cluster_sw_specs}.
+
+To conduct the scalability experiments, we increase the number of nodes in the Storm and Kafka/ HBase clusters up to 16 for each. The rest of the deployment details remain the same.
+
+\begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{figures/benchmarks_cluster_deployment}
 \caption{Cluster deployment diagram}
 \label{figure:benchmarks_cluster_deployment}
 \end{figure}
 
-The deployment diagram for the clusters is presented in Figure \ref{figure:benchmarks_cluster_deployment}. Each of the virtual machines has the specifications listed in Table \ref{table:benchmarks_cluster_hw_specs}. The versions of the software used in our experiments are listed in Table \ref{table:benchmarks_cluster_sw_specs}.
-
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -71,7 +73,7 @@ Disk & 80 GB \\ \hline
 \label{table:benchmarks_cluster_hw_specs}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -87,8 +89,6 @@ Phoenix & 4.4.0-HBase-1.1 \\ \hline
 \label{table:benchmarks_cluster_sw_specs}
 \end{table}
 
-To conduct the scalability experiments, we increase the number of nodes in the Storm and Kafka/HBase clusters up to 16 for each. The rest of the deployment details remain the same.
-
 
 \section{Kafka Performance and Scalability}
 
@@ -100,7 +100,7 @@ The producer can be configured to accumulate data in memory and to send out larg
 
 We experiment with different batch sizes and measure the message input throughput for our topic. The effects of batching on throughput can be observed in Table \ref{table:batch_size_throughput} and Figure \ref{figure:benchmarks_kafka_batch_2}.
 
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -117,7 +117,7 @@ Batch size & Throughput (messages/sec) \\ \hline \hline
 \label{table:batch_size_throughput}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_kafka_batch_2}
 \caption{Producer batch size effect on topic throughput}
@@ -130,9 +130,9 @@ Even though a bigger batch size can increase throughput by orders of magnitude, 
 
 Kafka \emph{end-to-end latency} is the time it takes for a message sent by a producer to be delivered to a consumer. For this experiment, the performance tool TestEndToEndLatency creates a producer and a consumer and repeatedly times how long it takes for a producer to send a message to the Kafka cluster and then be received by the consumer. 
 
-The average Kafka end-to-end latency is measured at \textbf{2.871 msec}. Other latency percentiles are presented at Table \ref{table:end-to-end_latency}.
+The average Kafka end-to-end latency is measured at \textbf{2.871 msec}. Other latency percentiles are presented in Table \ref{table:end-to-end_latency}.
 
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -151,7 +151,7 @@ In this experiment we use multiple producers that create messages for a single t
 
 Figure \ref{figure:benchmarks_kafka_producers} shows that the aggregate message input throughput increases linearly with the number of the simultaneous producers. This allows us to expand our system to collect and store in Kafka data from multiple different producer sources.
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_kafka_producers}
 \caption{Topic throughput scalability with the number of producers}
@@ -164,14 +164,14 @@ Partitions allow the topic to scale in size by being distributed over the broker
 
 To evaluate the scalability of the Kafka topic with the Kafka cluster size, we measure the message input throughput for clusters with different numbers of brokers. The number of the topic's partitons is adjusted according to the number of the brokers.
 
+As we can see in Figure \ref{figure:benchmarks_kafka_scalability} topic throughput scales almost linearly with Kafka cluster size.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_kafka_scalability}
 \caption{Topic throughput scalability with Kafka cluster size}
 \label{figure:benchmarks_kafka_scalability}
 \end{figure}
-
-As we can see in Figure \ref{figure:benchmarks_kafka_scalability} topic throughput scales almost linearly with Kafka cluster size.
 
 
 \section{Storm Performance Tuning}
@@ -184,7 +184,7 @@ To achieve maximum topology throughput, we experiment with the parallelism of it
 
 The \emph{capacity metric} tells us what percentage of the time in the last 10 minutes the bolt spent executing tuples. If this value is close to 1, then the bolt is 'at capacity' and is a bottleneck in our topology. The solution to at-capacity bolts is to increase the parallelism of that bolt. The listing used to compute the capacity metric is:
 
-\begin{lstlisting}[language=C]
+\begin{lstlisting}[language=C,frame=none]
 capacity = (executedTuplesNumber * averageExecuteLatency) / measurementTime
 \end{lstlisting}
 
@@ -192,7 +192,11 @@ During the parallelism tuning experiments, when we see that a bolt's capacity is
 
 Note that capacity is computed based on topology statistics, therefore its value may sometimes appear to be larger than 1. The parallelism of the Kafka Spout is always 4 to match the number of the topic's partitions.
 
-\begin{table}[H]
+As we can see in Figure \ref{figure:benchmarks_storm_tuning_throughput} we can achieve maximum topology throughput with the parallelism combination \textbf{4-4-4-16-28}. We use these parallelism settings for the rest of the benchmarks.
+
+We also record the average CPU utilization for the Storm and HBase clusters during the tuning experiments and present them in Figure \ref{figure:benchmarks_storm_tuning_cpu}. We notice that the processors of the Storm and HBase clusters are not saturated at maximum topology throughput, which indicates that the topology workload is I/O intensive. This was expected since the IP to DNS Bolt and the Phoenix Blot perform reads and writes respectively to HBase tables.
+
+\begin{table}[h!]
 \centering
 \resizebox{1\textwidth}{!} {
 \begin{tabular}{ |*{9}{c|} }
@@ -210,18 +214,14 @@ Note that capacity is computed based on topology statistics, therefore its value
 \label{table:parallelism_tuning}
 \end{table}
 
-As we can see in Figure \ref{figure:benchmarks_storm_tuning_throughput} we can achieve maximum topology throughput with the parallelism combination \textbf{4-4-4-16-28}. We use these parallelism settings for the rest of the benchmarks.
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_storm_tuning_throughput}
 \caption{Topology throughput during parallelism tuning experiments}
 \label{figure:benchmarks_storm_tuning_throughput}
 \end{figure}
 
-We also record the average CPU utilization for the Storm and HBase clusters during the tuning experiments and present them in Figure \ref{figure:benchmarks_storm_tuning_cpu}. We notice that the processors of the Storm and HBase clusters are not saturated at maximum topology throughput, which indicates that the topology workload is I/O intensive. This was expected since the IP to DNS Bolt and the Phoenix Blot perform reads and writes respectively to HBase tables.
-
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_storm_tuning_cpu}
 \caption{Average CPU utilization for the Storm and HBase clusters during parallelism tuning experiments}
@@ -234,7 +234,7 @@ Storm topologies have a \emph{maximum spout pending tuples} parameter. This valu
 
 We experiment with the maximum pending tuples value, while feeding the topology with messages at the maximum rate determined in Subsection \ref{subsection:benchmarks_storm_tuning} (around 2800 messages/sec). The results presented in Table \ref{table:batch_size_throughput} indicate that we can achieve maximum throughput by setting the value of the maximum pending tuples parameter over 100. To allow the topology to handle bursts of more messages, we use the value \textbf{200} for the maximum pending spout tuples parameter. In the case of a message burst, the in-flight tuples will spend more time in the internal queues of the topology, but their number will still be limited by the parameter to avoid failures by overloading.
 
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -251,11 +251,11 @@ Maximum pending tuples & Throughput (messages/sec) \\ \hline \hline
 
 \subsection{Bolt Execute Latencies}
 
-A useful metric that allows us to identify the bottlenecks in our topology is the \emph{•} of each bolt. \emph{Execute latency} is the average time a tuple spends in the execute method of a bolt. 
+A useful metric that allows us to identify the bottlenecks in our topology is the execute latency of each bolt. \emph{Execute latency} is the average time a tuple spends in the execute method of a bolt. 
 
 We record the execute latencies for each bolt of the topology at maximum throughput and present them in Table \ref{table:execute_latencies}. We also compare their relative sizes in Figure \ref{figure:benchmarks_storm_execute_latencies}. It is clear that the tuples spend practically all of their execute time in the IP to DNS Bolt and the Phoenix Bolt. This was expected since these bolts perform reads and writes to HBase tables, while the other bolts execute simple commands in memory.
 
-\begin{table}[H]
+\begin{table}[h!]
 \centering
 \begin{tabular}{ |c|c| }
 \hline
@@ -290,6 +290,10 @@ In this experiment we use a salted and a non-salted table, and compare the throu
 
 Figures \ref{figure:benchmarks_storm_salting_requests} and \ref{figure:benchmarks_storm_salting_cpu} demonstrate that salting serves its purpose by eliminating write hostspotting. Whereas all the write requests were directed to a single RegionServer for the non-salted table, the load is evenly distributed for the salted table. Note that higher aggregate CPU utilization while using the salted table is linked to better utilization of the cluster's resources, leading to higher topology throughput.
 
+Salting also decreases the Phoenix Bolt's execute latency by \textbf{74\%}, as we can see in Figure \ref{figure:benchmarks_storm_salting_latency}. The execute latency of the Bolt when writing to the non-salted table was increased due to the strain put on the RegionServer that handled all the write requests.
+
+Finally, Figure \ref{figure:benchmarks_storm_salting_throughput} demonstrates that salting massively increases the topology throughput by \textbf{140\%}.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_storm_salting_requests}
@@ -304,16 +308,12 @@ Figures \ref{figure:benchmarks_storm_salting_requests} and \ref{figure:benchmark
 \label{figure:benchmarks_storm_salting_cpu}
 \end{figure}
 
-Salting also decreases the Phoenix Bolt's execute latency by \textbf{74\%}, as we can see in Figure \ref{figure:benchmarks_storm_salting_latency}. The execute latency of the Bolt when writing to the non-salted table was increased due to the strain put on the RegionServer that handled all the write requests.
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_storm_salting_latency}
 \caption{Salting effect on Phoenix bolt latency}
 \label{figure:benchmarks_storm_salting_latency}
 \end{figure}
-
-Finally, Figure \ref{figure:benchmarks_storm_salting_throughput} demonstrates that salting massively increases the topology throughput by \textbf{140\%}.
 
 \begin{figure}[H]
 \centering
@@ -394,6 +394,14 @@ In our experiment we compare on-disk size and in-cache query latency for the fol
 \item The last table has both Fast Diff encoding enabled and Snappy compression enabled for all of its column families. Compressed BlockCache is enabled.
 \end{itemize}
 
+As we can see in Figure \ref{figure:benchmarks_hbase_compression_encoding_size}, using both compression and data block encoding reduces the data size further than the other options. Reduced data size allows more rows can me cached at the same time and reduces data transfer time from the disk to the BlockCache.
+
+However, the best in-cache query latency is achieved by compression alone, as seen in Figure \ref{figure:benchmarks_hbase_compression_encoding_latency}. The data size difference between the second and the third tables is not big enough to outweigh the query latency advantage of the compressed table. This is the reason why we chose compression and no data block encoding for our final table.
+
+\bigskip
+\bigskip
+\bigskip
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_hbase_compression_encoding_size}
@@ -408,15 +416,11 @@ In our experiment we compare on-disk size and in-cache query latency for the fol
 \label{figure:benchmarks_hbase_compression_encoding_latency}
 \end{figure}
 
-As we can see in Figure \ref{figure:benchmarks_hbase_compression_encoding_size}, using both compression and data block encoding reduces the data size further than the other options. Reduced data size allows more rows can me cached at the same time and reduces data transfer time from the disk to the BlockCache.
-
-However, the best in-cache query latency is achieved by compression alone. The data size difference between the second and the third tables is not big enough to outweigh the query latency advantage of the compressed table. This is the reason why we chose compression and no data block encoding for our final table.
-
 \subsection{Number of Column Families}
 
 We compare query performance between our final table, that includes three column families (d, as, dns), and the table containing the same data in one column family. Data is cached by column family, which means that count queries only cache the default family and topN AS queries cache only the as family.
 
-Total size of the final table is divided between the three column families with the percentages shown in Figure \ref{figure:benchmarks_hbase_cf_sizes}.
+The total size of the final table is divided between the three column families, with the percentages shown in Figure \ref{figure:benchmarks_hbase_cf_sizes}. We measure the total query latency, including data transfer time to the BlockCache, for queries over 1 million rows on the aforementioned tables and present the performance boost that multiple column families offer in Figure \ref{figure:benchmarks_hbase_cf_total_latency}.
 
 \begin{figure}[H]
 \centering
@@ -427,19 +431,12 @@ Total size of the final table is divided between the three column families with 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/benchmarks_hbase_cf_in-cache_latency}
-\caption{In-cache query latency for tables with different column family setups}
-\label{figure:benchmarks_hbase_cf_in-cache_latency}
-\end{figure}
-
-Even though the tables seem to have similar performance, the query latency in Figure \ref{figure:benchmarks_hbase_cf_in-cache_latency} is measured on already cached data. The actual performance boost is presented in Figure \ref{figure:benchmarks_hbase_cf_total_latency}, where total query latency (including data transfer time to the BlockCache) is measured for 1 million row queries.
-
-\begin{figure}[H]
-\centering
 \includegraphics[width=0.8\textwidth]{figures/benchmarks_hbase_cf_total_latency}
 \caption{Total query latency for tables with different column family setups}
 \label{figure:benchmarks_hbase_cf_total_latency}
 \end{figure}
+
+\bigskip
 
 \subsection{Salting Read Performance}\label{subsection:benchmarks_hbase_salting}
 

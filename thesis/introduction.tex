@@ -22,10 +22,6 @@ The use case for which we implement this system is the execution of SQL queries 
 The novelty of this thesis consists in combining state-of-the-art distributed technologies and techniques to minimize the execution latency of SQL queries that join a real-time data stream and an external dataset. We present an implementation that performs the join once during processing and allows subsequent queries to execute without the need to perform it again. Moreover, we provide a way of extending the system by adding external datasets of any size that are joined with the data stream. Finally, we apply a combination of optimizations that increase the system's performance.
 
 
-\section{Related Work}
-
-celliq
-
 \section{Thesis Outline}
 
 In Chapter \ref{chapter:theory} we provide the necessary theoretical background so that the reader can familiarize themselves with the frameworks and technologies used in in the thesis. More specifically, we present the characteristics, architecture and key concepts of Kafka, Storm, HDFS, HBase and Phoenix.

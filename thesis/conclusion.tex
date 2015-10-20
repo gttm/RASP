@@ -8,8 +8,19 @@ To achieve low query latency, we implemented a Storm topology that reads the dat
 
 We also applied a combination of optimizations to the HBase cluster and the Phoenix table that further reduce query latency. More specifically, we use multiple column families for the Phoenix table to reduce the data cached during each query. We enabled HDFS short-circuit for faster local reads. To increase read and write performance, we also enabled compression and salting on the Phoenix table and disabled data block encoding. In addition to that, we disabled BlockCache on the Reverse DNS table, to allow the Phoenix table to fully take advantage of the cache.
 
-Finally, we evaluated the performance of the system using a cluster of VMs. We recorded and analyzed the performance for every component of the system, including the Kafka topic, the Storm topology and the Phoenix table, while tuning the system and applying the aforementioned optimizations. The results demonstrated that our system can process packets with a satisfactory throughput, with a low total system latency and allows queries to be executed with low execute latency. We also experimented with the system's scalability with the cluster size, however in our evaluation setup it did not demonstrate linear scaling for large cluster sizes, since the aggregate disk I/O throughput was not increasing proportionally with cluster size.
+Finally, we evaluated the performance of the system using a cluster of VMs. We recorded and analyzed the performance for every component of the system, including the Kafka topic, the Storm topology and the Phoenix table, while tuning the system and applying the aforementioned optimizations. The results demonstrated that our system can process packets with a satisfactory throughput, with a low total system latency and allows queries to be executed with low execute latency. We also experimented with the system's scalability with the cluster size, however in our evaluation setup it did not demonstrate linear scaling for large cluster sizes, because the aggregate disk I/O throughput was not increasing proportionally with cluster size.
 
+
+\section{Related Work}
+
+TODO
+
+Datix
+Bro
+DBstream
+CellIQ
+FCCE
+SAP HANA SOE
 
 \section{Future Work}
 

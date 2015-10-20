@@ -1,5 +1,6 @@
 \documentclass[diploma]{softlab-thesis}
 
+\usepackage{microtype}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -10,6 +11,7 @@
 
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\algrenewcommand\textproc{}
 
 \usepackage{listings}
 \lstdefinelanguage[]{PhoenixSQL}[]{SQL}{
@@ -22,6 +24,7 @@
 	frame=single
 }
 
+\PassOptionsToPackage{hyphens}{url}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -41,7 +44,7 @@
 \frontmatter
 
 \title{Κατανεμημένη Αναλυτική Επεξεργασία Ροών Δικτυακών Δεδομένων σε Πραγματικό Χρόνο}
-\author{Γεώργιος Τουλούπας}
+\author{Γεώργιος Σ. Τουλούπας}
 \date{Οκτώβριος 2015}
 \datedefense{24}{10}{2015}
 
@@ -97,12 +100,14 @@
 \renewcommand{\indexname}{Index}
 \renewcommand{\appendixname}{Appendix}
 
+\begin{english}
 \input{introduction}
 \input{theoretical_background}
 \input{system_description}
 \input{optimizations}
 \input{evaluation}
 \input{conclusion}
+\end{english}
 
 %%%  Bibliography
 
