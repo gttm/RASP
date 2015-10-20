@@ -140,21 +140,13 @@ The Kafka Spout stores the offset of the consumer for each partition of the topi
 
 The tuple emitted by the Kafka Spout has a single field: a message from the topic containing the useful fields of the packet in CSV format. The Split Fields Bolt extracts these fields from the message. In addition to that the bolt computes the integer representations of the source and destiantion IP addresses, which are usually more useful than the IP addresses in dot-decimal notation.
 
-After processing the Kafka message, the Split Fileds Bolt emits a tuple containing the following fields: sourceIP, sourceIPInt, destinationIP, destinationIPInt, protocol, sourcePort, destinationPort, ipSize, dateTime. 
+After processing the Kafka message, the Split Fileds Bolt emits a tuple containing the following fields: sourceIP, sourceIPInt, destinationIP, destinationIPInt, protocol, sourcePort, destinationPort, ipSize, dateTime.
 
 \subsection{IP to AS Bolt}
 
 The join of the data stream and the Autonomous System dataset is performed by the IP to AS Bolt. The Autonomous System dataset maps IP address ranges to AS number and name. The data contained in the dataset are stored in CSV format and have 3 fields: the first IP address contained in the AS, the last IP address contained in the AS and the AS number and name. The IP adresses are stored in their integer representation format. The dataset file must be stored in a location accessible by all of the Supervisors, such as the HDFS. Further information on the dataset is available in Subsection \ref{subsection:benchmarks_as_dataset}.
 
 The defining characteristic of the Autonomous System dataset is that its size (13 MB) is small enough to fit in the memory, which is the optimal way to perform the join of the stream and the dataset. During the initialization of the topology the \texttt{prepare} method of the IP to AS Bolt is called and loads the dataset in a TreeMap structure. A TreeMap is a map implementation based on red-black trees, a variation of binary search trees, that allow searching in $O(\log{n})$ time \cite{treemap}. For each record of the dataset we insert two records in the TreeMap, containing the start and the stop IP address for each AS along with the AS number and name, as seen in Algorithm \ref{algorithm:ip_to_as_bolt}.
-
-The helper method \texttt{ipToAS} takes an IP address in integer representation format as input and returns the name and number of the AS it belongs. More specifically, by using the TreeMap's \texttt{ceilingKey} and \texttt{get} methods we find the first AS boundary IP address larger or equal to the input IP address. If this address is equal to the input IP address or corresponds to the last address of an AS IP address range, then the AS it belongs is the one we are looking for and its number and name is returned by the method. Otherwise the IP address provided does not belong to any AS according to the dataset and the \texttt{ipToAS} method returns the String \texttt{"null"}.
-
-For every tuple received by the bolt, the \texttt{execute} method is called. Using the sourceIPInt and destinationIPInt fields as input to the method \texttt{ipToAS} we determine the sourceAS and destinationAS fields that denote the source and destination AS number and name respectively. The new fields are appended to the received fields and all of them are emitted to the next bolt of the topology.
-
-Algorithm \ref{algorithm:ip_to_as_bolt} outlines the IP to AS Bolt implementation.
-
-\clearpage 
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -191,6 +183,12 @@ Algorithm \ref{algorithm:ip_to_as_bolt} outlines the IP to AS Bolt implementatio
 \caption{IP to AS Bolt}
 \label{algorithm:ip_to_as_bolt}
 \end{algorithm}
+
+The helper method \texttt{ipToAS} takes an IP address in integer representation format as input and returns the name and number of the AS it belongs. More specifically, by using the TreeMap's \texttt{ceilingKey} and \texttt{get} methods we find the first AS boundary IP address larger or equal to the input IP address. If this address is equal to the input IP address or corresponds to the last address of an AS IP address range, then the AS it belongs is the one we are looking for and its number and name is returned by the method. Otherwise the IP address provided does not belong to any AS according to the dataset and the \texttt{ipToAS} method returns the String \texttt{"null"}.
+
+For every tuple received by the bolt, the \texttt{execute} method is called. Using the sourceIPInt and destinationIPInt fields as input to the method \texttt{ipToAS} we determine the sourceAS and destinationAS fields that denote the source and destination AS number and name respectively. The new fields are appended to the received fields and all of them are emitted to the next bolt of the topology.
+
+\bigskip
 
 \subsection{IP to DNS Bolt}
 

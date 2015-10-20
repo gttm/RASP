@@ -11,20 +11,9 @@ We also applied a combination of optimizations to the HBase cluster and the Phoe
 Finally, we evaluated the performance of the system using a cluster of VMs. We recorded and analyzed the performance for every component of the system, including the Kafka topic, the Storm topology and the Phoenix table, while tuning the system and applying the aforementioned optimizations. The results demonstrated that our system can process packets with a satisfactory throughput, with a low total system latency and allows queries to be executed with low execute latency. We also experimented with the system's scalability with the cluster size, however in our evaluation setup it did not demonstrate linear scaling for large cluster sizes, because the aggregate disk I/O throughput was not increasing proportionally with cluster size.
 
 
-\section{Related Work}
-
-TODO
-
-Datix
-Bro
-DBstream
-CellIQ
-FCCE
-SAP HANA SOE
-
 \section{Future Work}
 
-Regarding future work that can evolve our system, propose the following:
+Regarding future work that can evolve our system, we propose the following:
 \begin{itemize}
 \item Properly evaluate the system's scalability using a cluster of physical nodes, each one assigned with a dedicated disk.
 \item Compare the Storm topology of our system to implementations in other distributed stream processing frameworks, such as Storm Trident \cite{trident}, Spark Streaming \cite{spark_streaming} and Samza \cite{samza}. Storm Trident and Spark Streaming are batching the data stream to achieve higher throughput.
