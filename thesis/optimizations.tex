@@ -40,7 +40,7 @@ Both compression (with compressed BlockCache enabled) and data block encoding re
 To achieve the best in-cache query latency we decide to use Snappy compression for our final Phoenix table, in conjunction with enabled compressed BlockCache and no data block encoding. The experiment on which we base this decision is presented in Subsection \ref{subsection:benchmarks_compression_encoding}.
 
 
-\section{Disable BlockCache on the Reverse DNS Table}
+\section{Disabling BlockCache on the Reverse DNS Table}
 
 The Reverse DNS dataset is stored in the \texttt{rdns} HBase table. This table is stored with Snappy compression and no data block encoding to reduce on-disk size and avoid the decoding performance hit on read. The on-disk size of the compressed table is 12GB.
 

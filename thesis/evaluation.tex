@@ -162,7 +162,7 @@ Figure \ref{figure:benchmarks_kafka_producers} shows that the aggregate message 
 
 Partitions allow the topic to scale in size by being distributed over the brokers of the cluster and act as the unit of parallelism, providing load balancing over the write and read requests of the producers and the consumers respectively.
 
-To evaluate the scalability of the Kafka topic with the Kafka cluster size, we measure the message input throughput for clusters with different numbers of brokers. The number of the topic's partitons is adjusted according to the number of the brokers.
+To evaluate the scalability of the Kafka topic with the Kafka cluster size, we measure the message input throughput for clusters with different numbers of brokers. The number of the topic's partitions is adjusted according to the number of the brokers.
 
 As we can see in Figure \ref{figure:benchmarks_kafka_scalability} topic throughput scales almost linearly with Kafka cluster size.
 
@@ -385,7 +385,7 @@ When HDFS short-circuit local reads are enabled total query time is reduced by \
 
 \subsection{Compression and Data Block Encoding}\label{subsection:benchmarks_compression_encoding}
 
-Compression and data block encoding can be used to reduce on-disk data size as well as in-cache data size, as we described in Section \ref{section:compression_encoding}. However this comes with a performace hit for decompression, decoding or both when reading the cached data.
+Compression and data block encoding can be used to reduce on-disk data size as well as in-cache data size, as we described in Section \ref{section:compression_encoding}. However this comes with a performance hit for decompression, decoding or both when reading the cached data.
 
 In our experiment we compare on-disk size and in-cache query latency for the following tables:
 \begin{itemize}

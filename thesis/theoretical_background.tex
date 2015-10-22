@@ -120,7 +120,7 @@ Storm supports the following stream groupings:
 \end{itemize}
 
 
-\section{Hadoop Distibuted File System}
+\section{Hadoop Distributed File System}
 
 The Hadoop Distributed File System (HDFS) \cite{hadoop,hdfs_design} is a distributed file system designed to run on commodity hardware, inspired by the Google File System \cite{gfs}. It can reliably store very large files across machines in a large cluster and provides high throughput access to large data sets. The HDFS is the storage part of the Hadoop framework, an Apache Top-Level Project since 2006.
 
@@ -188,7 +188,7 @@ There are four primary data model operations in HBase:
 
 \subsection{HBase Architecture}
 
-In HBase, tables are are divided horizontally by row key range into \emph{Regions}. Regions are vertically divided by column families into \emph{Stores}, which are stored as files at the HDFS (\emph{HFiles}). Figure \ref{figure:hbase_architecture} illustrates the architecture of HBase.
+In HBase, tables are divided horizontally by row key range into \emph{Regions}. Regions are vertically divided by column families into \emph{Stores}, which are stored as files at the HDFS (\emph{HFiles}). Figure \ref{figure:hbase_architecture} illustrates the architecture of HBase.
 
 \begin{figure}[h!]
 \centering
@@ -204,7 +204,7 @@ Every RegionServer has the following components:
 \item \textbf{WAL:} The Write Ahead Log stores new data that has not yet been persisted to permanent storage. It is used for recovery in the case of failure.
 \item \textbf{BlockCache:} Keeps data blocks resident in memory after they are read. Least Recently Used data is evicted when full.
 \item \textbf{MemStore:} Stores in-memory new data which has not yet been written to disk. There is one MemStore per column family per region. Once the MemStore fills, its contents are written to disk as additional HFiles.
-\item \textbf{Hfile:} Stores the rows as sorted key-values on disk.
+\item \textbf{HFile:} Stores the rows as sorted key-values on disk.
 \end{itemize}
 
 \begin{figure}[h!]
@@ -219,7 +219,7 @@ Every RegionServer has the following components:
 
 \subsection{Introduction}
 
-Apache Phoenix \cite{phoenix} is relational database layer for HBase, targeting low latency queries over HBase data. Phoenix provides a JDBC driver that hides the intricacies of Hbase, enabling users to create, delete, and alter SQL tables, views, indexes, and sequences, upsert and delete rows singly and in bulk, and query data through SQL. Phoenix began as an internal project by the company Salesforce and was subsequently open-sourced and became a top-level Apache project on 2014.
+Apache Phoenix \cite{phoenix} is relational database layer for HBase, targeting low latency queries over HBase data. Phoenix provides a JDBC driver that hides the intricacies of HBase, enabling users to create, delete, and alter SQL tables, views, indexes, and sequences, upsert and delete rows singly and in bulk, and query data through SQL. Phoenix began as an internal project by the company Salesforce and was subsequently open-sourced and became a top-level Apache project on 2014.
 
 \subsection{Phoenix Data Model}
 
@@ -252,7 +252,7 @@ TopN queries return the top N rows, where top rows are determined by the \texttt
 
 \begin{lstlisting}[language=PhoenixSQL]
 SELECT column1, column2, COUNT(*) AS pairCount
-FROM table
+FROM tableName
 WHERE column3 > 0
 GROUP BY column1, column2
 ORDER BY pairCount DESC
