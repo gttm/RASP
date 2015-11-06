@@ -23,23 +23,43 @@ import backtype.storm.topology.TopologyBuilder;
 public class DatixTopology {
 
 	public static void main(String[] args) throws Exception {
+		String table = "netdata";
+		String topic = "netdata";
+		int parallelism[] = {4, 4, 4, 16, 36};
+		int workers = 4;
+		int pending = 100;
+		int kafkaFetch = 128 * 1024;
+		
+		if (args.length > 0) {
+			topic = args[0];
+			table = args[1];
+			String p[] = args[2].split(",");
+			for (int i = 0; i < 5; i++)
+				parallelism[i] = Integer.parseInt(p[i]);
+			workers = Integer.parseInt(args[3]);
+			pending = Integer.parseInt(args[4]);
+			kafkaFetch = Integer.parseInt(args[5]) * 1024;
+		}
+		
 		// Input from kafka and fields preprocessing
 		BrokerHosts brokerHosts = new ZkHosts("zookeeper:2181", "/kafka/brokers");
-		SpoutConfig kafkaConfig = new SpoutConfig(brokerHosts, "netdata",
-				"/netdata", "storm");
+		SpoutConfig kafkaConfig = new SpoutConfig(brokerHosts, topic,
+				"/" + topic, "storm");
 		kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
+		kafkaConfig.bufferSizeBytes = 1024 * 1024;
+		kafkaConfig.fetchSizeBytes = kafkaFetch;
 
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("netDataLine", new KafkaSpout(kafkaConfig), 4);
-		builder.setBolt("netDataFields", new SplitFieldsBolt(), 4)
+		builder.setSpout("netDataLine", new KafkaSpout(kafkaConfig), parallelism[0]);
+		builder.setBolt("netDataFields", new SplitFieldsBolt(), parallelism[1])
 				.shuffleGrouping("netDataLine");
 		
 		// IP to AS
-		builder.setBolt("ipToAS", new IPToASBolt(), 4)
+		builder.setBolt("ipToAS", new IPToASBolt(), parallelism[2])
 				.shuffleGrouping("netDataFields");
 		
 		// IP to DNS
-		builder.setBolt("ipToDNS", new IPToDNSBolt(), 6)
+		builder.setBolt("ipToDNS", new IPToDNSBolt(), parallelism[3])
 				.shuffleGrouping("ipToAS");
 		
 		// Output to phoenix
@@ -47,16 +67,16 @@ public class DatixTopology {
 		JdbcMapper simpleJdbcMapper = new PhoenixMapper();
 		JdbcInsertBolt phoenixBolt = new JdbcInsertBolt(
 				connectionProvider, simpleJdbcMapper)
-				.withInsertQuery("UPSERT INTO \"netdata\" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
+				.withInsertQuery("UPSERT INTO \"" + table + "\" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
 				.withQueryTimeoutSecs(60);
 		
-		builder.setBolt("output", phoenixBolt, 6).shuffleGrouping("ipToDNS");
+		builder.setBolt("output", phoenixBolt, parallelism[4]).shuffleGrouping("ipToDNS");
 
 		Config conf = new Config();
-		conf.setNumWorkers(4);
-		conf.setNumAckers(4);
+		conf.setNumWorkers(workers);
+		conf.setNumAckers(workers);
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 60);
-		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 1000);
+		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, pending);
 
 		StormSubmitter.submitTopology("DatixTopology", conf,
 				builder.createTopology());
