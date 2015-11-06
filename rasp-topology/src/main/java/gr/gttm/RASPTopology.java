@@ -20,7 +20,7 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.topology.TopologyBuilder;
 
-public class DatixTopology {
+public class RASPTopology {
 
 	public static void main(String[] args) throws Exception {
 		String table = "netdata";
@@ -78,7 +78,7 @@ public class DatixTopology {
 		conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 60);
 		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, pending);
 
-		StormSubmitter.submitTopology("DatixTopology", conf,
+		StormSubmitter.submitTopology("RASPTopology", conf,
 				builder.createTopology());
 	}
 }

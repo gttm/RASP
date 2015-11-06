@@ -24,7 +24,7 @@ import storm.kafka.trident.OpaqueTridentKafkaSpout;
 import storm.kafka.trident.TridentKafkaConfig;
 import storm.trident.TridentTopology;
 
-public class DatixTridentTopology {
+public class RASPTridentTopology {
 
 	public static void main(String[] args) throws Exception {
 		// Kafka configuration
@@ -78,6 +78,6 @@ public class DatixTridentTopology {
 		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 20);
 		conf.put(Config.TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS, 200);
 
-		StormSubmitter.submitTopology("DatixTridentTopology", conf,	topology.build());
+		StormSubmitter.submitTopology("RASPTridentTopology", conf,	topology.build());
 	}
 }
