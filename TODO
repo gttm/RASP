@@ -1,6 +1,0 @@
-+ Use table with salting and separate column families for AS,DNS
-+ Co-host the Storm/Kafka/HDFS/Hbase clusters on the same vm cluster (nodes with 4 VCPUs, 8GB RAM, 60GB disk)
-+ Implement the topology in Trident for micro-batch processing
-- Add different sql queries
-- Make the topology modular (add an abtract process bolt to use in series OR use multiple streams that join on one hbase bolt)
-+ Tune the JVM GC settings for Hbase performance
